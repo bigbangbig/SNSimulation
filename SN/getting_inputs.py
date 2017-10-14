@@ -1,5 +1,3 @@
-
-
 def get_input(node, edge):
     try:
         node = int(input("How many nodes? "))
@@ -14,8 +12,7 @@ def main():
     nodes = 0
     edges = 0
     res = False
+    # تا زمانی که برای تعداد گره ها و یال ها عدد وارد نشده باشد، دریافت مقدار ورودی ادامه می یابد
     while not res:
         res, nodes, edges = get_input(nodes, edges)
-        # if res:
-        #     break
     return nodes, edges

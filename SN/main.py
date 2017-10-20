@@ -5,10 +5,12 @@ import getting_inputs as gi
 
 
 nodes, edges = gi.main()
+cooperatorsPercentage = 30
+
 g = init.go(nodes, edges)
 count = g.number_of_edges()
 print("Edge count: " + str(count))
-
+print("Strategy: " + str(init.find_node_by_id(1, g).strategy))
 # ___________________________________________
 # رسم شبکه
 options_2 = {

@@ -2,7 +2,7 @@ import networkx as nx
 import numpy as np
 
 
-class People:
+class Person:
     def __init__(self):
         self._strategy = None
         self._ID = None
@@ -27,7 +27,7 @@ class People:
 def create_network(node_count):
     g = nx.Graph()
     for i in range(node_count):
-        person = People()
+        person = Person()
         person.strategy = "D"
         person.id = i
         g.add_node(person)
@@ -50,6 +50,15 @@ def link(network, first, second):
     network.add_edge(first, second)
 
 
+def has_link(network, _first, _second):
+    first = find_node_by_id(_first, network)
+    second = find_node_by_id(_second, network)
+    if network.has_edge(first, second):
+        return True
+    else:
+        return False
+
+
 def create_random_links(network, how_many):
     count = network.number_of_nodes()
 
@@ -65,7 +74,7 @@ def create_random_links(network, how_many):
 
         # تا وقتی که یالی که مبدا و مقصد آن به صورت تصادفی انتخاب شده در گراف وجود داشته باشد
         # محاسبه مبدا و مقصد مجدداً انجام میشود
-        while network.has_edge(first, second):
+        while has_link(network, first, second):
             first = np.random.randint(0, count)
             second = np.random.randint(0, count)
 

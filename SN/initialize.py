@@ -24,11 +24,15 @@ class Person:
         self._ID = id_value
 
 
-def create_network(node_count):
+def create_network(node_count, coopRatio):
     g = nx.Graph()
+    cooperators_count = int(node_count * (coopRatio / 100))
     for i in range(node_count):
         person = Person()
-        person.strategy = "D"
+        if i < cooperators_count:
+            person.strategy = "C"
+        else:
+            person.strategy = "D"
         person.id = i
         g.add_node(person)
     return g
@@ -82,8 +86,8 @@ def create_random_links(network, how_many):
     return network
 
 
-def go(node_count, link_count):
-    net = create_network(node_count)
+def go(node_count, link_count, coopPercentage):
+    net = create_network(node_count, coopPercentage)
     res = create_random_links(net, link_count)
     return res
 

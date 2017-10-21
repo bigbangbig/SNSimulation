@@ -86,8 +86,8 @@ def create_random_links(network, how_many):
     return network
 
 
-def go(node_count, link_count, coopPercentage):
-    net = create_network(node_count, coopPercentage)
+def go(node_count, link_count, coop_percentage):
+    net = create_network(node_count, coop_percentage)
     res = create_random_links(net, link_count)
     return res
 

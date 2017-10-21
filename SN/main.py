@@ -15,6 +15,7 @@ print("Edge count: " + str(count))
 print("Strategy of node 1: " + str(init.find_node_by_id(1, g).strategy))
 string = "Strategy of node %d: " + str(init.find_node_by_id(limit, g).strategy)
 print(string % limit)
+
 # ___________________________________________
 # رسم شبکه
 options_2 = {

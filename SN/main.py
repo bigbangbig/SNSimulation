@@ -2,11 +2,12 @@ import networkx as nx
 import matplotlib.pylab as plt
 import initialize as init
 import getting_inputs as gi
-
+# import interface as gui
 
 nodes, edges = gi.main()
 cooperatorsPercentage = 30
 
+# gui()
 g = init.go(nodes, edges)
 count = g.number_of_edges()
 print("Edge count: " + str(count))

@@ -24,9 +24,9 @@ class Person:
         self._ID = id_value
 
 
-def create_network(node_count, coopRatio):
+def create_network(node_count, coop_ratio):
     g = nx.Graph()
-    cooperators_count = int(node_count * (coopRatio / 100))
+    cooperators_count = int(node_count * (coop_ratio / 100))
     for i in range(node_count):
         person = Person()
         if i < cooperators_count:

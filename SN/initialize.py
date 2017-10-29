@@ -6,6 +6,7 @@ class Person:
     def __init__(self):
         self._strategy = None
         self._ID = None
+        self._Fitness = 0
 
     @property
     def strategy(self):
@@ -23,8 +24,17 @@ class Person:
     def id(self, id_value):
         self._ID = id_value
 
+    @property
+    def fitness(self):
+        return self._Fitness
+
+    @fitness.setter
+    def fitness(self, fitness_value):
+        self._Fitness = fitness_value
+
 
 def create_network(node_count):
+    # todo add cooperators percentage here
     g = nx.Graph()
     for i in range(node_count):
         person = Person()
@@ -47,7 +57,8 @@ def find_node_by_id(_id, network):
 def link(network, first, second):
     first = find_node_by_id(first, network)
     second = find_node_by_id(second, network)
-    network.add_edge(first, second)
+    network.add_edge(first, second, state="hi")
+    # network.add_edge(first, second)
 
 
 def has_link(network, _first, _second):

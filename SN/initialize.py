@@ -33,12 +33,16 @@ class Person:
         self._Fitness = fitness_value
 
 
-def create_network(node_count):
+def create_network(node_count, percentage):
     # todo add cooperators percentage here
     g = nx.Graph()
+    how_many = int((node_count * percentage) / 100)
     for i in range(node_count):
         person = Person()
-        person.strategy = "D"
+        if i < how_many:
+            person.strategy = "C"
+        else:
+            person.strategy = "D"
         person.id = i
         g.add_node(person)
     return g
@@ -93,8 +97,8 @@ def create_random_links(network, how_many):
     return network
 
 
-def go(node_count, link_count):
-    net = create_network(node_count)
+def go(node_count, link_count, percentage):
+    net = create_network(node_count, percentage)
     res = create_random_links(net, link_count)
     return res
 

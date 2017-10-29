@@ -4,15 +4,18 @@ import initialize as init
 import getting_inputs as gi
 # import gui as interface
 import play
+import plots.main as plots
 
+
+# tkinter برای اینترفیس
+# py2exe برای ساختن فایل اجرایی برای ویندوز
 
 nodes, edges = gi.main()
-cooperatorsPercentage = 30
-
-g = init.go(nodes, edges)
+cooperatorsPercentage = 40
+g = init.go(nodes, edges, cooperatorsPercentage)
 count = g.number_of_edges()
-print("Edge count: " + str(count))
-print("Strategy: " + str(init.find_node_by_id(1, g).strategy))
+# print("Edge count: " + str(count))
+# print("Strategy: " + str(init.find_node_by_id(1, g).strategy))
 # ___________________________________________
 # رسم شبکه
 # options_2 = {
@@ -28,7 +31,17 @@ print("Strategy: " + str(init.find_node_by_id(1, g).strategy))
 # plt.show()
 # interface.go()
 
-play.go(g)
+# اطلاعات اولیه گراف را ذخیره میکند. مثل تعداد گره ها
+plots.init(g)
+
+# بازی به تعداد مشخص شده در رنج بین همه گره ها انجام میشود
+for i in range(1000):
+    play.go(g)
+    plots.save_network_info(g, i + 1)
+
+# رسم نمودار تعداد همکاری کنندگان
+plots.plot()
+
 for v in g.nodes():
     g.node[v]['state'] = str(v.fitness) + v.strategy
     # g.node[v]['dd'] = v.strategy
@@ -49,6 +62,6 @@ nx.draw_networkx_labels(g, pos, labels=node_labels)
 
 # edge_labels = nx.get_edge_attributes(g, 'state')
 # nx.draw_networkx_edge_labels(g, pos, labels=edge_labels)
-plt.savefig('this.png')
+plt.savefig('Network.png')
 plt.show()
 

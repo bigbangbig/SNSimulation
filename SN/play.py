@@ -18,6 +18,5 @@ def go(network):
         first.fitness += my_utility
         second.fitness += opponent_utility
 
-
 # strategy updates before the next round
 

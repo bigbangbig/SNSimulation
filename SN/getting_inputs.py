@@ -1,6 +1,9 @@
 def get_input(node, edge):
     try:
         node = int(input("How many nodes? "))
+        # بررسی اینکه تعداد گره ها کمتر از نباشد
+        if node < 2:
+            return False, node, edge
         edge = int(input("How many edges? "))
         return True, node, edge
     except Exception:

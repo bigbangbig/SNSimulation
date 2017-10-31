@@ -1,9 +1,9 @@
 import networkx as nx
 import matplotlib.pylab as plt
-import initialize as init
-import getting_inputs as gi
+import initialization.initialize as init
+import initialization.getting_inputs as gi
 # import gui as interface
-import play
+import games.play as play
 import plots.main as plots
 
 
@@ -62,6 +62,6 @@ nx.draw_networkx_labels(g, pos, labels=node_labels)
 
 # edge_labels = nx.get_edge_attributes(g, 'state')
 # nx.draw_networkx_edge_labels(g, pos, labels=edge_labels)
-plt.savefig('Network.png')
+plt.savefig('Images/Network.png')
 plt.show()
 

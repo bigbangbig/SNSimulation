@@ -14,7 +14,7 @@ def plot():
     plt.ylabel("Cooperators")
     plt.xlabel("Round Number")
     plt.plot(x, y)
-    plt.savefig("plots/Images/Cooperators")
+    plt.savefig("Images/Cooperators")
     plt.show()
 
 

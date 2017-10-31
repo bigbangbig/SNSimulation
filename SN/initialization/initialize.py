@@ -1,10 +1,12 @@
 import networkx as nx
 import numpy as np
+import utilities.search as search
 
 
 class Person:
     def __init__(self):
         self._strategy = None
+        self._new_strategy = None
         self._ID = None
         self._Fitness = 0
 
@@ -15,6 +17,14 @@ class Person:
     @strategy.setter
     def strategy(self, strategy):
         self._strategy = strategy
+
+    @property
+    def new_strategy(self):
+        return self._new_strategy
+
+    @new_strategy.setter
+    def new_strategy(self, new_strategy):
+        self._new_strategy = new_strategy
 
     @property
     def id(self):
@@ -34,7 +44,6 @@ class Person:
 
 
 def create_network(node_count, percentage):
-    # todo add cooperators percentage here
     g = nx.Graph()
     how_many = int((node_count * percentage) / 100)
     for i in range(node_count):
@@ -48,26 +57,16 @@ def create_network(node_count, percentage):
     return g
 
 
-def find_node_by_id(_id, network):
-    nodes = network.nodes()
-    for x in nodes:
-        if x.id == _id:
-            break
-    else:
-        x = None
-    return x
-
-
 def link(network, first, second):
-    first = find_node_by_id(first, network)
-    second = find_node_by_id(second, network)
+    first = search.find_node_by_id(first, network)
+    second = search.find_node_by_id(second, network)
     network.add_edge(first, second, state="hi")
     # network.add_edge(first, second)
 
 
 def has_link(network, _first, _second):
-    first = find_node_by_id(_first, network)
-    second = find_node_by_id(_second, network)
+    first = search.find_node_by_id(_first, network)
+    second = search.find_node_by_id(_second, network)
     if network.has_edge(first, second):
         return True
     else:

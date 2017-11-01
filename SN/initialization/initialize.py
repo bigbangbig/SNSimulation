@@ -18,6 +18,7 @@ class Person:
     def strategy(self, strategy):
         self._strategy = strategy
 
+    # استراتژی مرحله بعد در این فیلد ذخیره میشود
     @property
     def new_strategy(self):
         return self._new_strategy
@@ -45,13 +46,16 @@ class Person:
 
 def create_network(node_count, percentage):
     g = nx.Graph()
+    # g = nx.MultiDiGraph()
     how_many = int((node_count * percentage) / 100)
     for i in range(node_count):
         person = Person()
         if i < how_many:
             person.strategy = "C"
+            person.new_strategy = "C"
         else:
             person.strategy = "D"
+            person.new_strategy = "D"
         person.id = i
         g.add_node(person)
     return g
@@ -98,6 +102,10 @@ def create_random_links(network, how_many):
 
 def go(node_count, link_count, percentage):
     net = create_network(node_count, percentage)
+    # مجموع آلفا، بتا و گاما باید 1 باشد
+    # res = nx.scale_free_graph(node_count, alpha=0.41, beta=0.54, gamma=0.05,
+    #                           create_using=net)
+                              # delta_in=0.2, delta_out=0,
     res = create_random_links(net, link_count)
     return res
 

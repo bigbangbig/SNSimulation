@@ -13,6 +13,7 @@ nodes, edges = gi.main()
 cooperatorsPercentage = 30
 g = init.go(nodes, edges, cooperatorsPercentage)
 count = g.number_of_edges()
+print("Edges: " + str(count))
 
 # اطلاعات اولیه گراف را ذخیره میکند. مثل تعداد گره ها
 plots.init(g)
@@ -27,7 +28,7 @@ for i in range(50):
 # رسم نمودار تعداد همکاری کنندگان
 plots.plot()
 # رسم گراف نهایی
-# plots.show_network(g)
+plots.show_network(g)
 
 
 

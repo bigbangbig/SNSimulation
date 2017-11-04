@@ -1,5 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import plotly as py
+from plotly.graph_objs import *
 
 # متغیرهای عمومی برای ذخیره اطلاعات
 cooperators_in_round = []
@@ -41,8 +43,12 @@ def init(network):
 def show_network(g):
     # برای هر گره استراتژی و برازندگی هر یک از گره ها محاسبه شده
     # و به صورت برچسب در هر گره نمایش داده میشود
-    for v in g.nodes():
-        g.node[v]['state'] = str(v.fitness) + v.strategy
+    # for v in g.nodes():
+    #     g.node[v]['state'] = str(v.fitness) + v.strategy
+
+    # for v in g.nodes():
+    bb = nx.eigenvector_centrality(g)
+    nx.set_node_attributes(g, bb, 'state')
 
     pos = nx.spring_layout(g)
 
@@ -55,5 +61,106 @@ def show_network(g):
     # nx.draw_networkx_edge_labels(g, pos, labels=edge_labels)
     plt.savefig('Images/Network.png')
     plt.show()
+
+
+def draw(g):
+    pos = nx.fruchterman_reingold_layout(g)
+    N = node_count
+    Xv = [pos[k][0] for k in range(N)]
+    Yv = [pos[k][1] for k in range(N)]
+    Xed = []
+    Yed = []
+    for edge in g.edges():
+       Xed += [pos[edge[0]][0],pos[edge[1]][0], None]
+       Yed += [pos[edge[0]][1],pos[edge[1]][1], None]
+    width = 1500
+    height = 800
+    axis = dict(showline=False,  # hide axis line, grid, ticklabels and  title
+                zeroline=False,
+                showgrid=False,
+                showticklabels=False,
+                title=''
+                )
+    layout = Layout(title="The Network, nodes and connections between them",
+                    font=Font(size=12),
+                    showlegend=False,
+                    autosize=False,
+                    width=width,
+                    height=height,
+                    xaxis=XAxis(axis),
+                    yaxis=YAxis(axis),
+                    margin=Margin(
+                        l=40,
+                        r=40,
+                        b=85,
+                        t=100,
+                    ),
+                    hovermode='closest',
+                    annotations=Annotations([
+                        Annotation(
+                            showarrow=False,
+                            text='This igraph.Graph has the Kamada-Kawai layout',
+                            xref='paper',
+                            yref='paper',
+                            x=0,
+                            y=-0.1,
+                            xanchor='left',
+                            yanchor='bottom',
+                            font=Font(
+                                size=14
+                            )
+                        )
+                    ]),
+                    )
+
+    bb = nx.eigenvector_centrality(g)
+    nx.set_node_attributes(g, bb, 'state')
+    vals = nx.get_node_attributes(g, 'state')
+    labels = []
+    for i in vals:
+        labels.append("Centrality: " + str(vals[i]))
+
+    edge_trace = Scatter(x=Xed,
+                     y=Yed,
+                     mode='lines',
+                     line=Line(color='rgb(210,210,210)', width=1),
+                     hoverinfo='none'
+                     )
+    # colorscale options
+    # 'Greys' | 'Greens' | 'Bluered' | 'Hot' | 'Picnic' | 'Portland' |
+    # Jet' | 'RdBu' | 'Blackbody' | 'Earth' | 'Electric' | 'YIOrRd' | 'YIGnBu'
+    node_trace = Scatter(x=Xv,
+                     y=Yv,
+                     mode='markers',
+                     name='net',
+                     marker=Marker(symbol='dot',
+                                   size=15,
+                                   colorscale='YIOrRd',
+                                   reversescale=True,
+                                   color=[],
+                                   colorbar=dict(
+                                       thickness=15,
+                                       title='Node Centrality',
+                                       xanchor='left',
+                                       titleside='right'
+                                   ),
+                                   line=Line(color='rgb(50,50,50)', width=0.5)
+                                   ),
+                     text=labels,
+                     hoverinfo='text'
+                     )
+
+    for node in g.nodes():
+        node_trace['marker']['color'].append(g.nodes[node]['state'])
+
+    annot = "Number of nodes: " + str(node_count)
+
+# "<a href=''></a>"
+
+    data1 = Data([edge_trace, node_trace])
+    fig1 = Figure(data=data1, layout=layout)
+    fig1['layout']['annotations'][0]['text'] = annot
+    py.offline.plot(fig1, filename='Images/Network.html')
+
 
 

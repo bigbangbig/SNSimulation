@@ -1,6 +1,7 @@
 import networkx as nx
 import numpy as np
 import utilities.search as search
+import random
 
 
 class Person:
@@ -44,6 +45,8 @@ class Person:
         self._Fitness = fitness_value
 
 
+# DEPRECATED
+# ایجاد شبکه ای از افراد با تعداد مشخص و درصد اولیه مشخص
 def create_network(node_count, percentage):
     g = nx.Graph()
     # g = nx.MultiDiGraph()
@@ -61,6 +64,8 @@ def create_network(node_count, percentage):
     return g
 
 
+# DEPRECATED
+# ایجاد یال بین دو گره داده شده
 def link(network, first, second):
     first = search.find_node_by_id(first, network)
     second = search.find_node_by_id(second, network)
@@ -68,6 +73,7 @@ def link(network, first, second):
     # network.add_edge(first, second)
 
 
+# بررسی اینکه آیا در شبکه، بین گره های مشخص شده یال هست یا نه
 def has_link(network, _first, _second):
     first = search.find_node_by_id(_first, network)
     second = search.find_node_by_id(_second, network)
@@ -77,6 +83,8 @@ def has_link(network, _first, _second):
         return False
 
 
+# DEPRECATED
+# برای ساختن لینک های تصادفی به تعداد مشخص
 def create_random_links(network, how_many):
     count = network.number_of_nodes()
 
@@ -100,14 +108,27 @@ def create_random_links(network, how_many):
     return network
 
 
-def go(node_count, link_count, percentage):
-    net = create_network(node_count, percentage)
-    # مجموع آلفا، بتا و گاما باید 1 باشد
-    # res = nx.scale_free_graph(node_count, alpha=0.41, beta=0.54, gamma=0.05,
-    #                           create_using=net)
-                              # delta_in=0.2, delta_out=0,
-    res = create_random_links(net, link_count)
-    return res
+def go(node_count, percentage):
+    net = create_scale_free(node_count)
+    return net
 
-#
-# def set_strat(network, coopersPercent):
+
+def create_scale_free(node_count):
+    power_law_sequence = nx.utils.powerlaw_sequence(node_count, exponent=2.0)
+    seq_sum = 0
+
+    # برخی از اعداد ایجاد شده در توسط تابع powerlaw_sequence ممکن است کمتر از 1 باشند
+    # چون هدف بررسی انتشار همکاریست، نیاز داریم که همه نودها با هم ارتباط داشته باشند
+    # پس هر نود باید حداقل یک یال داشته باشد
+    for i in range(node_count):
+        power_law_sequence[i] = int(power_law_sequence[i]) + 1
+        seq_sum += power_law_sequence[i]
+
+    # تابع configuration_model به مجموع فرد نیاز دارد
+    if seq_sum % 2 != 0:
+        power_law_sequence[0] += 1
+
+    g = nx.configuration_model(power_law_sequence)
+    g = nx.Graph(g)
+    g.remove_edges_from(g.selfloop_edges())
+    return g

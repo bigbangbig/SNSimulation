@@ -4,31 +4,39 @@ import initialization.getting_inputs as gi
 import plots.main as plots
 import games.play as play
 import games.update_network as update
-
+import networkx as nx
 
 # tkinter برای اینترفیس
 # py2exe برای ساختن فایل اجرایی برای ویندوز
 
-nodes, edges = gi.main()
-cooperatorsPercentage = 30
-g = init.go(nodes, edges, cooperatorsPercentage)
-count = g.number_of_edges()
-print("Edges: " + str(count))
+# nodes, edges = gi.main()
+# cooperatorsPercentage = 30
+# g = init.go(nodes, edges, cooperatorsPercentage)
+# count = g.number_of_edges()
+# print("Edges: " + str(count))
+#
+# # اطلاعات اولیه گراف را ذخیره میکند. مثل تعداد گره ها
+# plots.init(g)
+# plots.save_network_info(g, 0)
+# # plots.show_network(g)
+# # بازی به تعداد مشخص شده در رنج بین همه گره ها انجام میشود
+# for i in range(50):
+#     play.go(g)
+#     update.copy_fittest(g)
+#     plots.save_network_info(g, i + 1)
 
-# اطلاعات اولیه گراف را ذخیره میکند. مثل تعداد گره ها
-plots.init(g)
-plots.save_network_info(g, 0)
+# # رسم نمودار تعداد همکاری کنندگان
+# plots.plot()
+# # رسم گراف نهایی
 # plots.show_network(g)
-# بازی به تعداد مشخص شده در رنج بین همه گره ها انجام میشود
-for i in range(50):
-    play.go(g)
-    update.copy_fittest(g)
-    plots.save_network_info(g, i + 1)
 
-# رسم نمودار تعداد همکاری کنندگان
-plots.plot()
-# رسم گراف نهایی
-plots.show_network(g)
+G = init.go(501, 10)
+plots.init(G)
+plots.draw(G)
+
+# todo create a list of person objects and use them to set attributes
+
+
 
 
 

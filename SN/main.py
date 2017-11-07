@@ -1,13 +1,9 @@
 import initialization.initialize as init
-import initialization.getting_inputs as gi
-# import gui as interface
 import plots.main as plots
 import games.play as play
 import games.update_network as update
 import networkx as nx
 
-# tkinter برای اینترفیس
-# py2exe برای ساختن فایل اجرایی برای ویندوز
 
 # nodes, edges = gi.main()
 # cooperatorsPercentage = 30
@@ -30,11 +26,10 @@ import networkx as nx
 # # رسم گراف نهایی
 # plots.show_network(g)
 
-G = init.go(501, 10)
+G = init.go(101, 50)
 plots.init(G)
 plots.draw(G)
 
-# todo create a list of person objects and use them to set attributes
 
 
 

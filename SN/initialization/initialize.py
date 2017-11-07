@@ -45,11 +45,9 @@ class Person:
         self._Fitness = fitness_value
 
 
-# DEPRECATED
-# ایجاد شبکه ای از افراد با تعداد مشخص و درصد اولیه مشخص
-def create_network(node_count, percentage):
-    g = nx.Graph()
-    # g = nx.MultiDiGraph()
+# ایجاد لیستی از افراد با تعداد مشخص و درصد اولیه مشخص
+def create_people(node_count, percentage):
+    people = []
     how_many = int((node_count * percentage) / 100)
     for i in range(node_count):
         person = Person()
@@ -60,8 +58,8 @@ def create_network(node_count, percentage):
             person.strategy = "D"
             person.new_strategy = "D"
         person.id = i
-        g.add_node(person)
-    return g
+        people.append(person)
+    return people
 
 
 # DEPRECATED
@@ -109,7 +107,15 @@ def create_random_links(network, how_many):
 
 
 def go(node_count, percentage):
+
     net = create_scale_free(node_count)
+    peoples_list = create_people(node_count, percentage)
+
+    # لیست ایجاد شده از افراد به یک دیکشنری تبدیل میشود تا بتوان در تابع set_node_attributes از آن استفاده کرد
+    people = {key: value for (key, value) in enumerate(peoples_list)}
+
+    nx.set_node_attributes(net, people, 'personality')
+
     return net
 
 

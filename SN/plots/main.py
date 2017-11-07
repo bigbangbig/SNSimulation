@@ -39,6 +39,7 @@ def init(network):
     node_count = len(network.nodes)
 
 
+# DEPRECATED
 # گراف شبکه را به عنوان ورودی دریافت کرده آن را رسم میکند
 def show_network(g):
     # برای هر گره استراتژی و برازندگی هر یک از گره ها محاسبه شده
@@ -113,42 +114,48 @@ def draw(g):
                     ]),
                     )
 
+    edge_trace = Scatter(x=Xed,
+                         y=Yed,
+                         mode='lines',
+                         line=Line(color='rgb(210,210,210)', width=1),
+                         hoverinfo='none'
+                         )
+
+    # ایجاد برچسب برای هر یک از گره ها
+    labels = []
+
+    # برچسب استراتژی
+    personalities = nx.get_node_attributes(g, 'personality')
+    for i in personalities:
+        labels.append("Strategy: " + str(personalities[i].strategy))
+
+    # برچسب مقدار مرکزیت بردار ویژه
     bb = nx.eigenvector_centrality(g)
     nx.set_node_attributes(g, bb, 'state')
-    vals = nx.get_node_attributes(g, 'state')
-    labels = []
-    for i in vals:
-        labels.append("Centrality: " + str(vals[i]))
+    centrality_values = nx.get_node_attributes(g, 'state')
+    for i in centrality_values:
+        labels[i] += ("<br>Centrality: " + str(centrality_values[i]))
 
-    edge_trace = Scatter(x=Xed,
-                     y=Yed,
-                     mode='lines',
-                     line=Line(color='rgb(210,210,210)', width=1),
-                     hoverinfo='none'
-                     )
-    # colorscale options
-    # 'Greys' | 'Greens' | 'Bluered' | 'Hot' | 'Picnic' | 'Portland' |
-    # Jet' | 'RdBu' | 'Blackbody' | 'Earth' | 'Electric' | 'YIOrRd' | 'YIGnBu'
     node_trace = Scatter(x=Xv,
-                     y=Yv,
-                     mode='markers',
-                     name='net',
-                     marker=Marker(symbol='dot',
-                                   size=15,
-                                   colorscale='YIOrRd',
-                                   reversescale=True,
-                                   color=[],
-                                   colorbar=dict(
-                                       thickness=15,
-                                       title='Node Centrality',
-                                       xanchor='left',
-                                       titleside='right'
-                                   ),
-                                   line=Line(color='rgb(50,50,50)', width=0.5)
-                                   ),
-                     text=labels,
-                     hoverinfo='text'
-                     )
+                         y=Yv,
+                         mode='markers',
+                         name='net',
+                         marker=Marker(symbol='dot',
+                                       size=15,
+                                       colorscale='YIOrRd',
+                                       reversescale=True,
+                                       color=[],
+                                       colorbar=dict(
+                                           thickness=15,
+                                           title='Node Centrality',
+                                           xanchor='left',
+                                           titleside='right'
+                                       ),
+                                       line=Line(color='rgb(50,50,50)', width=0.5)
+                                       ),
+                         text=labels,
+                         hoverinfo='text'
+                         )
 
     for node in g.nodes():
         node_trace['marker']['color'].append(g.nodes[node]['state'])

@@ -26,7 +26,7 @@ def save_network_info(network, game_round):
     cooperators = 0
     # تعداد همکاری کنندگان را محاسبه کرده
     for i in network.nodes:
-        if i.strategy == "C":
+        if network.nodes[i]['personality'].strategy == "C":
             cooperators += 1
     global cooperators_in_round
     # و این تعداد را به همراه شماره دور کنونی در یک لیست ذخیره می کند
@@ -164,10 +164,16 @@ def draw(g):
 
 # "<a href=''></a>"
 
-    data1 = Data([edge_trace, node_trace])
+    fig1 = py.tools.make_subplots(rows=2, cols=1)
+    trace = Scatter(
+                x=[1, 2, 3],
+                y=[4, 5, 6]
+            )
+    # fig1.append_trace(trace, 2, 1)
+    data1 = Data([edge_trace, node_trace, trace])
     fig1 = Figure(data=data1, layout=layout)
-    fig1['layout']['annotations'][0]['text'] = annot
+    # fig1['layout']['annotations'][0]['text'] = annot
     py.offline.plot(fig1, filename='Images/Network.html')
 
-
+#     todo for annotations, title and each plot's config go to documentation: https://plot.ly/python/subplots/
 

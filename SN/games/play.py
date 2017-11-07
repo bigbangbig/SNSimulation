@@ -12,11 +12,12 @@ def prisoners_dilemma(first, second):
 def go(network):
     for edge in network.edges():
         # در دو سر هر یال، بازیکن ها قرار گرفته اند
-        first = edge[0]
-        second = edge[1]
-        my_utility, opponent_utility = prisoners_dilemma(first.strategy, second.strategy)
-        first.fitness += my_utility
-        second.fitness += opponent_utility
+        first = network.nodes[edge[0]]
+        second = network.nodes[edge[1]]
+        my_utility, opponent_utility = prisoners_dilemma(first['personality'].strategy,
+                                                         second['personality'].strategy)
+        first['personality'].fitness += my_utility
+        second['personality'].fitness += opponent_utility
 
 # strategy updates before the next round
 

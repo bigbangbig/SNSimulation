@@ -13,13 +13,7 @@ import networkx as nx
 #
 # # اطلاعات اولیه گراف را ذخیره میکند. مثل تعداد گره ها
 # plots.init(g)
-# plots.save_network_info(g, 0)
 # # plots.show_network(g)
-# # بازی به تعداد مشخص شده در رنج بین همه گره ها انجام میشود
-# for i in range(50):
-#     play.go(g)
-#     update.copy_fittest(g)
-#     plots.save_network_info(g, i + 1)
 
 # # رسم نمودار تعداد همکاری کنندگان
 # plots.plot()
@@ -28,6 +22,12 @@ import networkx as nx
 
 G = init.go(101, 50)
 plots.init(G)
+plots.save_network_info(G, 0)
+# # بازی به تعداد مشخص شده در رنج بین همه گره ها انجام میشود
+for i in range(50):
+    play.go(G)
+    update.copy_fittest(G)
+    plots.save_network_info(G, i + 1)
 plots.draw(G)
 
 

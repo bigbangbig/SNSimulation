@@ -8,13 +8,17 @@ def copy_fittest(network):
         maximum_fitness = 0
         fittest_mate = -1
         for mate in network.neighbors(node):
-            if mate.fitness > maximum_fitness:
-                maximum_fitness = mate.fitness
-                fittest_mate = mate.id
+            if network.nodes[mate]['personality'].fitness > maximum_fitness:
+                maximum_fitness = network.nodes[mate]['personality'].fitness
+                fittest_mate = network.nodes[mate]['personality'].id
         # استراتژی برازنده ترین همسایه انتخاب می شود
         if not fittest_mate == -1:
-            node.new_strategy = ut.find_node_by_id(fittest_mate, network).strategy
+            network.nodes[node]['personality'].new_strategy = network.nodes[fittest_mate]['personality']\
+                .strategy
 
     # استراتژی های انتخاب شده به عنوان استراتژی مرحله بعد ثبت میشوند
     for node in network.nodes():
-        node.strategy = node.new_strategy
+        network.nodes[node]['personality'].strategy = network.nodes[node]['personality'].new_strategy
+
+
+

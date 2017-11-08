@@ -12,13 +12,13 @@ node_count = 0
 def plot():
     x = [x[0] for x in cooperators_in_round]
     y = [x[1] for x in cooperators_in_round]
-    plt.ylim([0, node_count + int((node_count * 10) / 100)])
-    plt.title("Cooperators in each round of the game")
-    plt.ylabel("Cooperators")
-    plt.xlabel("Round Number")
-    plt.plot(x, y)
-    plt.savefig("Images/Cooperators")
-    plt.show()
+    trace = Scatter(
+        x=x,
+        y=y,
+        mode='lines'
+    )
+    data = [trace]
+    py.offline.plot(data, filename='Images/Cooperators.html')
 
 
 # شماره دور بازی و گراف شبکه را به صورت ورودی دریافت می کند
@@ -163,17 +163,14 @@ def draw(g):
     annot = "Number of nodes: " + str(node_count)
 
 # "<a href=''></a>"
-
-    fig1 = py.tools.make_subplots(rows=2, cols=1)
-    trace = Scatter(
-                x=[1, 2, 3],
-                y=[4, 5, 6]
-            )
-    # fig1.append_trace(trace, 2, 1)
-    data1 = Data([edge_trace, node_trace, trace])
+    data1 = Data([edge_trace, node_trace])
     fig1 = Figure(data=data1, layout=layout)
-    # fig1['layout']['annotations'][0]['text'] = annot
+    fig1['layout']['annotations'][0]['text'] = annot
     py.offline.plot(fig1, filename='Images/Network.html')
 
 #     todo for annotations, title and each plot's config go to documentation: https://plot.ly/python/subplots/
 
+
+def show_results(g):
+    draw(g)
+    plot()

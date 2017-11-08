@@ -10,6 +10,7 @@ class Person:
         self._new_strategy = None
         self._ID = None
         self._Fitness = 0
+        self._utility = 0
 
     @property
     def strategy(self):
@@ -43,6 +44,14 @@ class Person:
     @fitness.setter
     def fitness(self, fitness_value):
         self._Fitness = fitness_value
+
+    @property
+    def utility(self):
+        return self._utility
+
+    @utility.setter
+    def fitness(self, util_value):
+        self._utility = util_value
 
 
 # ایجاد لیستی از افراد با تعداد مشخص و درصد اولیه مشخص

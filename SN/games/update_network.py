@@ -1,5 +1,6 @@
-import utilities.search as ut
-
+import random
+import initialization
+import math
 
 # از بین همسایگان، استراتژی برازنده ترین آنها به عنوان استراتژی دور بعد انتخاب میشود
 def copy_fittest(network):
@@ -20,5 +21,28 @@ def copy_fittest(network):
     for node in network.nodes():
         network.nodes[node]['personality'].strategy = network.nodes[node]['personality'].new_strategy
 
+
+def conditional_update(network):
+    # احتمال تغییر استراتژی
+    first = initialization.initialize.Person()
+    second = initialization.initialize.Person()
+
+    first.strategy = "D"
+    second.strategy = "C"
+
+    # احتمال اینکه بازین اول، استراتژی بازیکن دوم را انتخاب کند
+    chance = 0
+    if not first.strategy == second.strategy:
+        # chance = 90 / 100
+        homophily = 10
+        noise_level = 1
+        difference = (first.utiliy - second.utility) / (homophily * noise_level)
+        chance = 1 / 1 + math.exp(difference)
+    # متغیر تصادفی برای اعمال احتمال
+    fate = random.randrange(0, 100) / 100
+    if chance > fate:
+        print("changed")
+    else:
+        print("not")
 
 

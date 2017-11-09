@@ -130,11 +130,23 @@ def draw(g):
         labels.append("Strategy: " + str(personalities[i].strategy))
 
     # برچسب مقدار مرکزیت بردار ویژه
-    bb = nx.eigenvector_centrality(g)
-    nx.set_node_attributes(g, bb, 'state')
-    centrality_values = nx.get_node_attributes(g, 'state')
-    for i in centrality_values:
-        labels[i] += ("<br>Centrality: " + str(centrality_values[i]))
+    # در صورت رخ دادن exception تا 10 بار محاسبه مجددا انجام میشود
+    while True:
+        counter = 0;
+        try:
+            if counter > 10:
+                break
+            bb = nx.eigenvector_centrality(g)
+
+            nx.set_node_attributes(g, bb, 'state')
+            centrality_values = nx.get_node_attributes(g, 'state')
+            for i in centrality_values:
+                labels[i] += ("<br>Centrality: " + str(centrality_values[i]))
+
+        except nx.exception.PowerIterationFailedConvergence:
+            continue
+        break
+        counter += 1
 
     node_trace = Scatter(x=Xv,
                          y=Yv,
@@ -160,9 +172,9 @@ def draw(g):
     for node in g.nodes():
         node_trace['marker']['color'].append(g.nodes[node]['state'])
 
-    annot = "Number of nodes: " + str(node_count)
+    annot = "Number of nodes: " + str(node_count) + "<br>" +\
+            "Cooperators in last round: " + str(cooperators_in_round[-1][1])
 
-# "<a href=''></a>"
     data1 = Data([edge_trace, node_trace])
     fig1 = Figure(data=data1, layout=layout)
     fig1['layout']['annotations'][0]['text'] = annot

@@ -50,7 +50,7 @@ class Person:
         return self._utility
 
     @utility.setter
-    def fitness(self, util_value):
+    def utility(self, util_value):
         self._utility = util_value
 
 
@@ -146,4 +146,8 @@ def create_scale_free(node_count):
     g = nx.configuration_model(power_law_sequence)
     g = nx.Graph(g)
     g.remove_edges_from(g.selfloop_edges())
+
+    for i in range(node_count):
+        if g.degree(i) == 0:
+            print("dddddduuuuude")
     return g

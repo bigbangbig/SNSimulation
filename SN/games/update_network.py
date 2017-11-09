@@ -2,6 +2,7 @@ import random
 import initialization
 import math
 
+
 # از بین همسایگان، استراتژی برازنده ترین آنها به عنوان استراتژی دور بعد انتخاب میشود
 def copy_fittest(network):
     for node in network.nodes():
@@ -23,26 +24,54 @@ def copy_fittest(network):
 
 
 def conditional_update(network):
-    # احتمال تغییر استراتژی
-    first = initialization.initialize.Person()
-    second = initialization.initialize.Person()
+    homophily = 1
+    noise_level = 1
+    for node in network.nodes():
+        position = network.nodes[node]
+        person = network.nodes[node]['personality']
+        # شانس تغییر استراتژی برای تمامی همسایه ها محاسبه میشود
+        # بیشترین مقدار در این متغیر قرار میگیرد
+        maximum_chance = 0
+        strategy = person.strategy
 
-    first.strategy = "D"
-    second.strategy = "C"
+        # بازیکن دوم به صورت تصادفی از بین همسایه ها انتخاب میشود
+        mate = random.choice(list(network.neighbors(node)))
+        second_person = network.nodes[mate]['personality']
+        # احتمال اینکه بازیکن اول، استراتژی بازیکن دوم را انتخاب کند
+        chance = 0
+        # محاسبه تنها در صورتی انجام میشود که استراتژی گره ها متفاوت باشد
+        if not person.strategy == second_person.strategy:
+            # chance = 90 / 100
+            difference = (person.utility - second_person.utility) / (homophily * noise_level)
+            chance = 1 / 1 + math.exp(difference)
+        if chance > maximum_chance:
+            maximum_chance = chance
+            strategy = second_person.strategy
 
-    # احتمال اینکه بازین اول، استراتژی بازیکن دوم را انتخاب کند
-    chance = 0
-    if not first.strategy == second.strategy:
-        # chance = 90 / 100
-        homophily = 10
-        noise_level = 1
-        difference = (first.utiliy - second.utility) / (homophily * noise_level)
-        chance = 1 / 1 + math.exp(difference)
-    # متغیر تصادفی برای اعمال احتمال
-    fate = random.randrange(0, 100) / 100
-    if chance > fate:
-        print("changed")
-    else:
-        print("not")
+        # احتمال تغییر استراتژی با همه گره های همسایه بررسی میشود
+        # for mate in network.neighbors(node):
+        #     second_person = network.nodes[mate]['personality']
+        #     # احتمال اینکه بازیکن اول، استراتژی بازیکن دوم را انتخاب کند
+        #     chance = 0
+        #     # محاسبه تنها در صورتی انجام میشود که استراتژی گره ها متفاوت باشد
+        #     if not person.strategy == second_person.strategy:
+        #         # chance = 90 / 100
+        #         difference = (person.utility - second_person.utility) / (homophily * noise_level)
+        #         chance = 1 / 1 + math.exp(difference)
+        #     if chance > maximum_chance:
+        #         maximum_chance = chance
+        #         strategy = second_person.strategy
+
+        # متغیر تصادفی برای اعمال احتمال
+        fate = random.randrange(0, 100) / 100
+        if maximum_chance > fate:
+            # استراتژی مرحله بعد در این فیلد ذخیره میشود تا اثر ناخواسته ای..
+            # در فرایند محاسبه استراتژیِ جدیدِ سایر گره ها ایجاد نشود
+            person.new_strategy = strategy
+
+    # پس از محاسبه استراتژی جدید تمامی گره ها، این مقدار در متغیر مربوطه قرار میگیرد
+    for node in network.nodes():
+        person = network.nodes[node]['personality']
+        person.strategy = person.new_strategy
 
 

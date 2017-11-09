@@ -4,18 +4,18 @@ import games.play as play
 import games.update_network as update
 
 #  اطلاعات اولیه گراف را ذخیره میکند. مثل تعداد گره ها
-G = init.go(101, 50)
+G = init.go(500, 10)
 plots.init(G)
 plots.save_network_info(G, 0)
 
 # # بازی به تعداد مشخص شده در range بین همه گره ها انجام میشود
-for i in range(150):
+for i in range(200):
     play.go(G)
-    update.copy_fittest(G)
+    # update.copy_fittest(G)
     update.conditional_update(G)
     plots.save_network_info(G, i + 1)
 
-# plots.show_results(G)
+plots.show_results(G)
 
 
 

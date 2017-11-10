@@ -26,6 +26,7 @@ def copy_fittest(network):
 def conditional_update(network):
     homophily = 1
     noise_level = 1
+
     for node in network.nodes():
         position = network.nodes[node]
         person = network.nodes[node]['personality']
@@ -43,12 +44,17 @@ def conditional_update(network):
         if not person.strategy == second_person.strategy:
             # chance = 90 / 100
             difference = (person.utility - second_person.utility) / (homophily * noise_level)
-            chance = 1 / 1 + math.exp(difference)
+            # اگر مقداری که در توان e قرار میگیرد از حد مجاز بیشتر باشد، به جای آن بی نهایت قرار میدهیم
+            try:
+                exponent = math.exp(difference)
+            except OverflowError:
+                exponent = math.inf
+            chance = 1 / 1 + exponent
         if chance > maximum_chance:
             maximum_chance = chance
             strategy = second_person.strategy
 
-        # احتمال تغییر استراتژی با همه گره های همسایه بررسی میشود
+        # # احتمال تغییر استراتژی با همه گره های همسایه بررسی میشود
         # for mate in network.neighbors(node):
         #     second_person = network.nodes[mate]['personality']
         #     # احتمال اینکه بازیکن اول، استراتژی بازیکن دوم را انتخاب کند
@@ -57,7 +63,12 @@ def conditional_update(network):
         #     if not person.strategy == second_person.strategy:
         #         # chance = 90 / 100
         #         difference = (person.utility - second_person.utility) / (homophily * noise_level)
-        #         chance = 1 / 1 + math.exp(difference)
+        #         # اگر مقداری که در توان e قرار میگیرد از حد مجاز بیشتر باشد، به جای آن بی نهایت قرار میدهیم
+        #         try:
+        #             exponent = math.exp(difference)
+        #         except OverflowError:
+        #             exponent = math.inf
+        #         chance = 1 / 1 + exponent
         #     if chance > maximum_chance:
         #         maximum_chance = chance
         #         strategy = second_person.strategy

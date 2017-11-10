@@ -2,10 +2,13 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import plotly as py
 from plotly.graph_objs import *
+import operator
 
 # متغیرهای عمومی برای ذخیره اطلاعات
 cooperators_in_round = []
 node_count = 0
+centrality_values = []
+initial_info = ""
 
 
 # رسم نمودار تعداد همکاری کنندگان بر حسب دورهای بازی
@@ -38,6 +41,39 @@ def init(network):
     global node_count
     node_count = len(network.nodes)
 
+    # محاسبه مقدار مرکزیت بردار ویژه
+    # در صورت رخ دادن exception تا 10 بار محاسبه مجددا انجام میشود
+    while True:
+        counter = 0
+        try:
+            global centrality_values
+            if counter > 10:
+                print("Eigenvector centrality calculation stopped with errors. ")
+                break
+            bb = nx.eigenvector_centrality(network)
+
+            nx.set_node_attributes(network, bb, 'state')
+            centrality_values = nx.get_node_attributes(network, 'state')
+
+            sorted_centralities = reversed(sorted(bb.items(), key=operator.itemgetter(1)))
+
+            global initial_info
+            # print(sorted_centralities[-10:])
+            # print(network.nodes[1]['state'])
+            centrality_counter = 1
+            initial_info = "<br><br>Strategies of the most central nodes at the beginning: <br>"
+            for (node, centrality) in sorted_centralities:
+                if centrality_counter > 10:
+                    break
+                initial_info += "(" + str(centrality_counter) + "). Centrality: " + '%.5f' % centrality +\
+                                ", Strategy: " + network.nodes[node]['personality'].strategy + "<br>"
+                centrality_counter += 1
+
+        except nx.exception.PowerIterationFailedConvergence:
+            continue
+        break
+        counter += 1
+
 
 # DEPRECATED
 # گراف شبکه را به عنوان ورودی دریافت کرده آن را رسم میکند
@@ -66,14 +102,14 @@ def show_network(g):
 
 def draw(g):
     pos = nx.fruchterman_reingold_layout(g)
-    N = node_count
-    Xv = [pos[k][0] for k in range(N)]
-    Yv = [pos[k][1] for k in range(N)]
-    Xed = []
-    Yed = []
+    n = node_count
+    xv = [pos[k][0] for k in range(n)]
+    yv = [pos[k][1] for k in range(n)]
+    xed = []
+    yed = []
     for edge in g.edges():
-       Xed += [pos[edge[0]][0],pos[edge[1]][0], None]
-       Yed += [pos[edge[0]][1],pos[edge[1]][1], None]
+        xed += [pos[edge[0]][0], pos[edge[1]][0], None]
+        yed += [pos[edge[0]][1], pos[edge[1]][1], None]
     width = 1500
     height = 800
     axis = dict(showline=False,  # hide axis line, grid, ticklabels and  title
@@ -114,8 +150,8 @@ def draw(g):
                     ]),
                     )
 
-    edge_trace = Scatter(x=Xed,
-                         y=Yed,
+    edge_trace = Scatter(x=xed,
+                         y=yed,
                          mode='lines',
                          line=Line(color='rgb(210,210,210)', width=1),
                          hoverinfo='none'
@@ -130,26 +166,12 @@ def draw(g):
         labels.append("Strategy: " + str(personalities[i].strategy))
 
     # برچسب مقدار مرکزیت بردار ویژه
-    # در صورت رخ دادن exception تا 10 بار محاسبه مجددا انجام میشود
-    while True:
-        counter = 0;
-        try:
-            if counter > 10:
-                break
-            bb = nx.eigenvector_centrality(g)
+    global centrality_values
+    for i in centrality_values:
+        labels[i] += ("<br>Centrality: " + str(centrality_values[i]))
 
-            nx.set_node_attributes(g, bb, 'state')
-            centrality_values = nx.get_node_attributes(g, 'state')
-            for i in centrality_values:
-                labels[i] += ("<br>Centrality: " + str(centrality_values[i]))
-
-        except nx.exception.PowerIterationFailedConvergence:
-            continue
-        break
-        counter += 1
-
-    node_trace = Scatter(x=Xv,
-                         y=Yv,
+    node_trace = Scatter(x=xv,
+                         y=yv,
                          mode='markers',
                          name='net',
                          marker=Marker(symbol='dot',
@@ -172,15 +194,14 @@ def draw(g):
     for node in g.nodes():
         node_trace['marker']['color'].append(g.nodes[node]['state'])
 
-    annot = "Number of nodes: " + str(node_count) + "<br>" +\
-            "Cooperators in last round: " + str(cooperators_in_round[-1][1])
+    annotation = "Number of nodes: " + str(node_count) + "<br>" +\
+                 "Cooperators in last round: " + str(cooperators_in_round[-1][1]) +\
+                 initial_info
 
     data1 = Data([edge_trace, node_trace])
     fig1 = Figure(data=data1, layout=layout)
-    fig1['layout']['annotations'][0]['text'] = annot
+    fig1['layout']['annotations'][0]['text'] = annotation
     py.offline.plot(fig1, filename='Images/Network.html')
-
-#     todo for annotations, title and each plot's config go to documentation: https://plot.ly/python/subplots/
 
 
 def show_results(g):

@@ -4,7 +4,7 @@ import games.play as play
 import games.update_network as update
 
 #  اطلاعات اولیه گراف را ذخیره میکند. مثل تعداد گره ها
-G = init.go(500, 10)
+G = init.go(500, 30)
 plots.init(G)
 plots.save_network_info(G, 0)
 

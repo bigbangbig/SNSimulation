@@ -118,13 +118,12 @@ def create_random_links(network, how_many):
 def go(node_count, percentage):
 
     net = create_scale_free(node_count)
-    peoples_list = create_people(node_count, percentage)
+    peoples_list = create_people(node_count + 2, percentage)
 
     # لیست ایجاد شده از افراد به یک دیکشنری تبدیل میشود تا بتوان در تابع set_node_attributes از آن استفاده کرد
     people = {key: value for (key, value) in enumerate(peoples_list)}
 
     nx.set_node_attributes(net, people, 'personality')
-
     return net
 
 
@@ -132,7 +131,7 @@ def create_scale_free(node_count):
     power_law_sequence = nx.utils.powerlaw_sequence(node_count, exponent=2.0)
     seq_sum = 0
 
-    # برخی از اعداد ایجاد شده در توسط تابع powerlaw_sequence ممکن است کمتر از 1 باشند
+    # تعداد زیادی از اعداد ایجاد شده توسط تابع powerlaw_sequence کمتر از 1 خواهند بود
     # چون هدف بررسی انتشار همکاریست، نیاز داریم که همه نودها با هم ارتباط داشته باشند
     # پس هر نود باید حداقل یک یال داشته باشد
     for i in range(node_count):
@@ -147,7 +146,20 @@ def create_scale_free(node_count):
     g = nx.Graph(g)
     g.remove_edges_from(g.selfloop_edges())
 
-    for i in range(node_count):
-        if g.degree(i) == 0:
-            print("dddddduuuuude")
+    # با این که حداقل تعداد یالها 1 در نظر گرفته شده
+    # ممکن است با ایجاد یک چند ضلعی بدون قطر، گراف همبند نباشد (در یکی از اجراها یک مثلث جدا مشاهده شد)
+    # در این قسمت، وجود چند مولفه همبندی بررسی شده، و در صورت نیاز بین آنها اتصال برقرار خواهد شد
+    if not nx.is_connected(g):
+        print("Network is not connected. Attempting to connect the components..")
+        component_counter = 0
+        components = sorted(nx.connected_component_subgraphs(g), key=len)
+        for c in range(len(components)):
+            if component_counter == 0:
+                component_counter += 1
+                continue
+            else:
+                g.add_edge(next(iter(components[component_counter].nodes())),
+                           next(iter(components[component_counter - 1].nodes())))
+                component_counter += 1
+
     return g

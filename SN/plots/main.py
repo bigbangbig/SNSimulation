@@ -201,9 +201,11 @@ def draw(g):
     data1 = Data([edge_trace, node_trace])
     fig1 = Figure(data=data1, layout=layout)
     fig1['layout']['annotations'][0]['text'] = annotation
-    py.offline.plot(fig1, filename='Images/Network.html')
+    # py.offline.plot(fig1, filename='Images/Network.html')
+    return fig1
 
 
 def show_results(g):
-    draw(g)
-    plot()
+    figure = draw(g)
+    # plot()
+    return figure

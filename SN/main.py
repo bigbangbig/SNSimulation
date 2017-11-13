@@ -22,18 +22,13 @@ for i in range(200):
     update.conditional_update(G)
     plots.save_network_info(G, i + 1)
 
-fig = plots.show_results(G)
+fig, annotation = plots.show_results(G)
 
 app = dash.Dash()
-# styles = {
-#     'body': {
-#         'font-family': 'Dosis, "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif !important;'
-#     }
-# }
 
 app.css.config.serve_locally = True
 app.scripts.config.serve_locally = True
-# app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
+
 app.layout = html.Div(children=[
     html.Link(
         rel='stylesheet',
@@ -41,10 +36,10 @@ app.layout = html.Div(children=[
     ),
     html.H1(children='Analysing Human Cooperation Patterns'),
 
-    html.Div(children='''
-        
+    html.H3(children='''
+        The Network, nodes and connections between them
     '''),
-
+    html.Div(annotation),
     dcc.Graph(
         id='example-graph',
         figure=fig

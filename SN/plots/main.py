@@ -3,12 +3,13 @@ import matplotlib.pyplot as plt
 import plotly as py
 from plotly.graph_objs import *
 import operator
+import dash_html_components as html
 
 # متغیرهای عمومی برای ذخیره اطلاعات
 cooperators_in_round = []
 node_count = 0
 centrality_values = []
-initial_info = ""
+children = []
 
 
 # رسم نمودار تعداد همکاری کنندگان بر حسب دورهای بازی
@@ -61,12 +62,18 @@ def init(network):
             # print(sorted_centralities[-10:])
             # print(network.nodes[1]['state'])
             centrality_counter = 1
-            initial_info = "<br><br>Strategies of the most central nodes at the beginning: <br>"
+            global children
+            children = [
+                html.Br(),
+                html.Br(),
+                "Strategies of the most central nodes at the beginning: ",
+                html.Br()]
             for (node, centrality) in sorted_centralities:
                 if centrality_counter > 10:
                     break
-                initial_info += "(" + str(centrality_counter) + "). Centrality: " + '%.5f' % centrality +\
-                                ", Strategy: " + network.nodes[node]['personality'].strategy + "<br>"
+                children.append(html.Span("(" + str(centrality_counter) + "). Centrality: " + '%.5f' % centrality +
+                                ", Strategy: " + network.nodes[node]['personality'].strategy))
+                children.append(html.Br())
                 centrality_counter += 1
 
         except nx.exception.PowerIterationFailedConvergence:
@@ -118,8 +125,7 @@ def draw(g):
                 showticklabels=False,
                 title=''
                 )
-    layout = Layout(title="The Network, nodes and connections between them",
-                    font=Font(size=12),
+    layout = Layout(font=Font(size=12),
                     showlegend=False,
                     autosize=False,
                     width=width,
@@ -132,22 +138,7 @@ def draw(g):
                         b=85,
                         t=100,
                     ),
-                    hovermode='closest',
-                    annotations=Annotations([
-                        Annotation(
-                            showarrow=False,
-                            text='This igraph.Graph has the Kamada-Kawai layout',
-                            xref='paper',
-                            yref='paper',
-                            x=0,
-                            y=-0.1,
-                            xanchor='left',
-                            yanchor='bottom',
-                            font=Font(
-                                size=14
-                            )
-                        )
-                    ]),
+                    hovermode='closest'
                     )
 
     edge_trace = Scatter(x=xed,
@@ -194,15 +185,17 @@ def draw(g):
     for node in g.nodes():
         node_trace['marker']['color'].append(g.nodes[node]['state'])
 
-    annotation = "Number of nodes: " + str(node_count) + "<br>" +\
-                 "Cooperators in last round: " + str(cooperators_in_round[-1][1]) +\
-                 initial_info
+    annotation = html.Div(children=[html.P("Number of nodes: " + str(node_count)),
+                                    html.Br(),
+                                    "Cooperators in last round: " + str(cooperators_in_round[-1][1]),
+                                    html.Br(),
+                                    html.P(children= children)])
 
     data1 = Data([edge_trace, node_trace])
     fig1 = Figure(data=data1, layout=layout)
-    fig1['layout']['annotations'][0]['text'] = annotation
+    # fig1['layout']['annotations'][0]['text'] = annotation
     # py.offline.plot(fig1, filename='Images/Network.html')
-    return fig1
+    return fig1, annotation
 
 
 def show_results(g):

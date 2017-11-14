@@ -22,7 +22,11 @@ def plot():
         mode='lines'
     )
     data = [trace]
-    py.offline.plot(data, filename='Images/Cooperators.html')
+    # py.offline.plot(data, filename='Images/Cooperators.html')
+    figure = Figure(
+        data=data
+    )
+    return figure
 
 
 # شماره دور بازی و گراف شبکه را به صورت ورودی دریافت می کند
@@ -185,11 +189,10 @@ def draw(g):
     for node in g.nodes():
         node_trace['marker']['color'].append(g.nodes[node]['state'])
 
-    annotation = html.Div(children=[html.P("Number of nodes: " + str(node_count)),
+    annotation = html.Div(children=[html.Span("Number of nodes: " + str(node_count)),
                                     html.Br(),
                                     "Cooperators in last round: " + str(cooperators_in_round[-1][1]),
-                                    html.Br(),
-                                    html.P(children= children)])
+                                    html.Span(children=children)])
 
     data1 = Data([edge_trace, node_trace])
     fig1 = Figure(data=data1, layout=layout)
@@ -200,5 +203,5 @@ def draw(g):
 
 def show_results(g):
     figure = draw(g)
-    # plot()
-    return figure
+    coop_plot = plot()
+    return figure, coop_plot

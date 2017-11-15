@@ -16,16 +16,18 @@ app = dash.Dash()
 
 fig = []
 coop_plot = []
-
+how_many_people = 500
+cooperation_percentage = 30
+rounds = 200
 
 def evolve():
     #  اطلاعات اولیه گراف را ذخیره میکند. مثل تعداد گره ها
-    graph = init.go(500, 30)
+    graph = init.go(how_many_people, cooperation_percentage)
     plots.init(graph)
     plots.save_network_info(graph, 0)
 
     # # بازی به تعداد مشخص شده در range بین همه گره ها انجام میشود
-    for i in range(200):
+    for i in range(rounds):
         play.go(graph)
         # update.copy_fittest(G)
         update.conditional_update(graph)
@@ -64,7 +66,7 @@ app.layout = html.Div(children=[
             id='plot',
             figure=coop_plot
         )
-    ], className= "graph-section"),
+    ], className="graph-section"),
     html.Hr(),
     # __________________________________________________________
     # اطلاعات شبکه، تعداد نودها و استراتژی اولیه نودهای مرکزی
@@ -72,13 +74,50 @@ app.layout = html.Div(children=[
         html.H3(id='hi', children=['Network information']),
         html.Div(id='network-info', children=fig[1])],
         className="section"),
+    html.Div(children=[
+        html.Span(id='node-count-value',
+                  children=how_many_people),
+        html.Span(id='cooperators-value',
+                  children=cooperation_percentage),
+        html.Span(id='rounds-value',
+                  children=rounds)
+    ]),
     # اجرای شبیه سازی
     html.Div(children=[
         html.Button('Start the Evolution', id='go'),
         dcc.Input(id='signal',
                   type='text',
-                  value=''),
-        ], className='section')
+                  value='',
+                  style={'display': 'none'}),
+        # تعداد نودها
+        dcc.Slider(
+                id='node-count',
+                min=10,
+                max=10000,
+                step=50,
+                value=200,
+                vertical=False
+        ),
+        # درصد همکاری کنندگان
+        dcc.Slider(
+                id='cooperators',
+                min=1,
+                max=100,
+                step=1,
+                value=10,
+                vertical=False
+        ),
+        # تعداد دورهای بازی
+        dcc.Slider(
+                id="rounds",
+                min=1,
+                max=500,
+                step=50,
+                value=200,
+                vertical=False
+        )
+        ], className='section'),
+
 ])
 
 
@@ -113,6 +152,30 @@ def graph(value):
               [dash.dependencies.Input('signal', 'value')])
 def info(value):
     return fig[1]
+
+
+@app.callback(dash.dependencies.Output('node-count-value', 'children'),
+              [dash.dependencies.Input('node-count', 'value')])
+def change_count(value):
+    global how_many_people
+    how_many_people = value
+    return value
+
+
+@app.callback(dash.dependencies.Output('cooperators-value', 'children'),
+              [dash.dependencies.Input('cooperators', 'value')])
+def change_count(value):
+    global cooperation_percentage
+    cooperation_percentage = value
+    return value
+
+
+@app.callback(dash.dependencies.Output('rounds-value', 'children'),
+              [dash.dependencies.Input('rounds', 'value')])
+def change_count(value):
+    global rounds
+    rounds = value
+    return value
 
 
 @app.server.route('/dash_files/<path:path>')

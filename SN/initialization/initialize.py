@@ -118,7 +118,7 @@ def create_random_links(network, how_many):
 def go(node_count, percentage):
 
     net = create_scale_free(node_count)
-    peoples_list = create_people(node_count + 2, percentage)
+    peoples_list = create_people(node_count, percentage)
 
     # لیست ایجاد شده از افراد به یک دیکشنری تبدیل میشود تا بتوان در تابع set_node_attributes از آن استفاده کرد
     people = {key: value for (key, value) in enumerate(peoples_list)}

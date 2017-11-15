@@ -46,6 +46,9 @@ def init(network):
     global node_count
     node_count = len(network.nodes)
 
+    global cooperators_in_round
+    cooperators_in_round = []
+
     # محاسبه مقدار مرکزیت بردار ویژه
     # در صورت رخ دادن exception تا 10 بار محاسبه مجددا انجام میشود
     while True:
@@ -62,9 +65,6 @@ def init(network):
 
             sorted_centralities = reversed(sorted(bb.items(), key=operator.itemgetter(1)))
 
-            global initial_info
-            # print(sorted_centralities[-10:])
-            # print(network.nodes[1]['state'])
             centrality_counter = 1
             global children
             children = [
@@ -131,9 +131,7 @@ def draw(g):
                 )
     layout = Layout(font=Font(size=12),
                     showlegend=False,
-                    autosize=False,
-                    width=width,
-                    height=height,
+                    autosize=True,
                     xaxis=XAxis(axis),
                     yaxis=YAxis(axis),
                     margin=Margin(
@@ -198,6 +196,7 @@ def draw(g):
     fig1 = Figure(data=data1, layout=layout)
     # fig1['layout']['annotations'][0]['text'] = annotation
     # py.offline.plot(fig1, filename='Images/Network.html')
+    # return Figure(data=data1), annotation
     return fig1, annotation
 
 

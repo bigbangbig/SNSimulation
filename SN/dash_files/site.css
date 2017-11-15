@@ -8,6 +8,17 @@ H1, H2, H3{
 }
 
 
+.graph-section{
+    width:50%;
+    float:right;
+    margin:50;
+}
+
+.section{
+    clear:both;
+    margin-left: 10%;
+}
+
 @font-face {
     font-family: dosis;
     src: url('fonts/Dosis-Regular.ttf')  format('truetype');

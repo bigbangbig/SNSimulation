@@ -4,10 +4,11 @@ import games.play as play
 import games.update_network as update
 
 import dash
-from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
 import os
+
+from dash.dependencies import Input, Output
 from flask import send_from_directory
 
 
@@ -15,16 +16,9 @@ app = dash.Dash()
 
 fig = []
 coop_plot = []
-count = 0
 
 
 def evolve():
-    global count
-    if not count == 0:
-        # todo check
-
-        print()
-
     #  اطلاعات اولیه گراف را ذخیره میکند. مثل تعداد گره ها
     graph = init.go(500, 30)
     plots.init(graph)
@@ -51,31 +45,40 @@ app.layout = html.Div(children=[
         href='/dash_files/site.css'
     ),
     html.H1(children='Analysing Human Cooperation Patterns'),
+    html.Hr(),
+    # _______________________________________________________
     # گراف شبکه در نسل آخر
-    html.Hr(),
-    html.H3(children='''
-        The Network, nodes and connections between them
-    '''),
-    dcc.Graph(
-        id='graph',
-        figure=fig[0]
-    ),
+    html.Div(children=[
+        html.H3(children='''
+                The Network, nodes and connections between them
+                '''),
+        dcc.Graph(
+            id='graph',
+            figure=fig[0]
+            )
+    ], className='graph-section'),
     # نمودار تغییر تعداد همکاری کنندگان در طول نسلها
+    html.Div(children=[
+        html.H3('Number of cooperators in each generation/round'),
+        dcc.Graph(
+            id='plot',
+            figure=coop_plot
+        )
+    ], className= "graph-section"),
     html.Hr(),
-    html.H3('Number of cooperators in each generation/round'),
-    dcc.Graph(
-        id='plot',
-        figure=coop_plot
-    ),
+    # __________________________________________________________
     # اطلاعات شبکه، تعداد نودها و استراتژی اولیه نودهای مرکزی
-    html.Hr(),
-    html.H3(id='hi', children=['Network information']),
-    html.Div(id='network-info', children=fig[1]),
+    html.Div(children=[
+        html.H3(id='hi', children=['Network information']),
+        html.Div(id='network-info', children=fig[1])],
+        className="section"),
     # اجرای شبیه سازی
-    html.Button('Start the Evolution', id='go'),
-    dcc.Input(id='signal',
-              type='text',
-              value='')
+    html.Div(children=[
+        html.Button('Start the Evolution', id='go'),
+        dcc.Input(id='signal',
+                  type='text',
+                  value=''),
+        ], className='section')
 ])
 
 
@@ -88,29 +91,28 @@ app.layout = html.Div(children=[
 
 @app.callback(dash.dependencies.Output('signal', 'value'),
               [dash.dependencies.Input('go', 'n_clicks')])
-def update_output(n_clicks):
-    evolve()
+def signal(n_clicks):
+    if not n_clicks == 0:
+        evolve()
     return n_clicks
 
 
 @app.callback(dash.dependencies.Output('plot', 'figure'),
               [dash.dependencies.Input('signal', 'value')])
-def update_plot(value):
+def plot(value):
     return coop_plot
 
 
 @app.callback(dash.dependencies.Output('graph', 'figure'),
               [dash.dependencies.Input('signal', 'value')])
-def update_plot(value):
+def graph(value):
     return fig[0]
 
 
 @app.callback(dash.dependencies.Output('network-info', 'children'),
               [dash.dependencies.Input('signal', 'value')])
-def update_plot(value):
+def info(value):
     return fig[1]
-#     todo check the name of the callback functions
-# todo set the global variables of the cooperators in round to zero
 
 
 @app.server.route('/dash_files/<path:path>')

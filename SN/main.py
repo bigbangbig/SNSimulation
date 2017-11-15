@@ -20,6 +20,7 @@ how_many_people = 500
 cooperation_percentage = 30
 rounds = 200
 
+
 def evolve():
     #  اطلاعات اولیه گراف را ذخیره میکند. مثل تعداد گره ها
     graph = init.go(how_many_people, cooperation_percentage)
@@ -75,28 +76,38 @@ app.layout = html.Div(children=[
         html.Div(id='network-info', children=fig[1])],
         className="section"),
     html.Div(children=[
+        html.H3("Selected settings"),
+        html.Span('Nodes (the number of people): '),
         html.Span(id='node-count-value',
                   children=how_many_people),
+        html.Br(),
+        html.Span('Cooperators percentage in beginning: '),
         html.Span(id='cooperators-value',
                   children=cooperation_percentage),
+        html.Span('%'),
+        html.Br(),
+        html.Span('Rounds to be played (number of generations): '),
         html.Span(id='rounds-value',
-                  children=rounds)
-    ]),
-    # اجرای شبیه سازی
-    html.Div(children=[
-        html.Button('Start the Evolution', id='go'),
+                  children=rounds),
+        html.Button('Start the Evolution', id='go', className='button',
+                    style={"vertical-align": "middle"}),
         dcc.Input(id='signal',
                   type='text',
                   value='',
                   style={'display': 'none'}),
+    ], className='section'),
+    # اجرای شبیه سازی
+    html.Div(children=[
+        html.H3("Configure the simulation"),
         # تعداد نودها
         dcc.Slider(
                 id='node-count',
-                min=10,
-                max=10000,
+                min=50,
+                max=1000,
                 step=50,
                 value=200,
-                vertical=False
+                updatemode='drag',
+                className="slider"
         ),
         # درصد همکاری کنندگان
         dcc.Slider(
@@ -105,33 +116,26 @@ app.layout = html.Div(children=[
                 max=100,
                 step=1,
                 value=10,
-                vertical=False
+                updatemode='drag',
+                className="slider"
         ),
         # تعداد دورهای بازی
         dcc.Slider(
                 id="rounds",
-                min=1,
+                min=50,
                 max=500,
                 step=50,
                 value=200,
-                vertical=False
-        )
-        ], className='section'),
-
+                updatemode='drag',
+                className="slider"
+        )], className='section'),
 ])
-
-
-# @app.callback(
-#     dash.dependencies.Output('cooperators-plot', 'figure'))
-# def update_plot():
-#     global coop_plot
-#     return coop_plot
 
 
 @app.callback(dash.dependencies.Output('signal', 'value'),
               [dash.dependencies.Input('go', 'n_clicks')])
 def signal(n_clicks):
-    if not n_clicks == 0:
+    if not n_clicks == 0 and n_clicks is not None:
         evolve()
     return n_clicks
 

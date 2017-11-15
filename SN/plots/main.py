@@ -68,8 +68,8 @@ def init(network):
             centrality_counter = 1
             global children
             children = [
-                html.Br(),
-                html.Br(),
+                # html.Br(),
+                # html.Br(),
                 "Strategies of the most central nodes at the beginning: ",
                 html.Br()]
             for (node, centrality) in sorted_centralities:
@@ -187,9 +187,10 @@ def draw(g):
     for node in g.nodes():
         node_trace['marker']['color'].append(g.nodes[node]['state'])
 
-    annotation = html.Div(children=[html.Span("Number of nodes: " + str(node_count)),
-                                    html.Br(),
-                                    "Cooperators in last round: " + str(cooperators_in_round[-1][1]),
+    annotation = html.Div(children=[
+                                    # html.Span("Number of nodes: " + str(node_count)),
+                                    # html.Br(),
+                                    # "Cooperators in last round: " + str(cooperators_in_round[-1][1]),
                                     html.Span(children=children)])
 
     data1 = Data([edge_trace, node_trace])

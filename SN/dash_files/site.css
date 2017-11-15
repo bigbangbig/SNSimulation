@@ -11,12 +11,15 @@ H1, H2, H3{
 .graph-section{
     width:50%;
     float:right;
-    margin:50;
 }
 
 .section{
-    clear:both;
-    margin-left: 10%;
+    float: left;
+    width: 33%;
+}
+
+.slider{
+    padding-top: 2.3%;
 }
 
 @font-face {
@@ -29,3 +32,31 @@ H1, H2, H3{
     font-family: roboto;
     src: url('fonts/Roboto-Light.ttf')  format('truetype');
 }
+
+.button {
+  font-family: roboto;
+  display: inline-block;
+  border-radius: 1px;
+  background-color: #9ab39b;
+  border: none;
+  color: #100303;
+  text-align: center;
+  font-size: 19px;
+  padding: 1.9%;
+  width: 50%;
+  height: 10%;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin-top:5%;
+  margin-left: 10%;
+}
+
+.button span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+
+

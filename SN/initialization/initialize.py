@@ -141,6 +141,13 @@ def set_cooperators(network, percentage, position):
 
 def go(node_count, percentage, position):
 
+    # clusters = 3
+    # size = int(node_count / clusters)
+    # net1 = create_scale_free(size + (node_count - (size * 3)))
+    # for i in range(clusters):
+    #     gg = create_scale_free(size)
+    #     net1 = nx.compose(net1, gg)
+    # net = net1
     net = create_scale_free(node_count)
     peoples_list = create_people(node_count)
 
@@ -175,6 +182,7 @@ def create_scale_free(node_count):
     power_law_sequence = nx.utils.powerlaw_sequence(node_count, exponent=2.0)
     seq_sum = 0
 
+    # clusters_list[0] = nx.utils.powerlaw_sequence(size + (node_count - (size * clusters)), exponent=2.0)
     # تعداد زیادی از اعداد ایجاد شده توسط تابع powerlaw_sequence کمتر از 1 خواهند بود
     # چون هدف بررسی انتشار همکاریست، نیاز داریم که همه نودها با هم ارتباط داشته باشند
     # پس هر نود باید حداقل یک یال داشته باشد

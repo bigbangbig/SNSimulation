@@ -45,5 +45,4 @@ def go(network, game):
         second['personality'].fitness += opponent_utility
         second['personality'].utility += opponent_utility
 
-# strategy updates before the next round
 

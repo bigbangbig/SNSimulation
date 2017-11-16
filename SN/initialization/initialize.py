@@ -140,7 +140,7 @@ def set_cooperators(network, percentage, position):
 
 
 def go(node_count, percentage, position):
-
+    # todo make the connecting component part, a function
     clusters = 3
     size = int(node_count / clusters)
     net1 = create_scale_free(size + (node_count - (size * 3)))
@@ -160,9 +160,8 @@ def go(node_count, percentage, position):
                 continue
             else:
                 net.add_edge(next(iter(components[component_counter].nodes())),
-                           next(iter(components[component_counter - 1].nodes())))
+                             next(iter(components[component_counter - 1].nodes())))
                 component_counter += 1
-    print(len(net.nodes()))
     peoples_list = create_people(node_count)
 
     # لیست ایجاد شده از افراد به یک دیکشنری تبدیل میشود تا بتوان در تابع set_node_attributes از آن استفاده کرد
@@ -191,7 +190,7 @@ def go(node_count, percentage, position):
         nx.set_node_attributes(net, bb, 'state')
 
     except nx.exception.PowerIterationFailedConvergence:
-        print("hi")
+        print("Eigenvector centrality calculation stopped with errors.")
 
     first_generation = set_cooperators(net, percentage, position)
 

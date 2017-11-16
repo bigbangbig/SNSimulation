@@ -141,14 +141,28 @@ def set_cooperators(network, percentage, position):
 
 def go(node_count, percentage, position):
 
-    # clusters = 3
-    # size = int(node_count / clusters)
-    # net1 = create_scale_free(size + (node_count - (size * 3)))
-    # for i in range(clusters):
-    #     gg = create_scale_free(size)
-    #     net1 = nx.compose(net1, gg)
-    # net = net1
+    clusters = 3
+    size = int(node_count / clusters)
+    net1 = create_scale_free(size + (node_count - (size * 3)))
+    for i in range(clusters - 1):
+        print(len(net1))
+        gg = create_scale_free(size)
+        net1 = nx.disjoint_union(net1, gg)
     net = create_scale_free(node_count)
+    net = net1
+    if not nx.is_connected(net):
+        print("Network is not connected. Attempting to connect the components..")
+        component_counter = 0
+        components = sorted(nx.connected_component_subgraphs(net), key=len)
+        for c in range(len(components)):
+            if component_counter == 0:
+                component_counter += 1
+                continue
+            else:
+                net.add_edge(next(iter(components[component_counter].nodes())),
+                           next(iter(components[component_counter - 1].nodes())))
+                component_counter += 1
+    print(len(net.nodes()))
     peoples_list = create_people(node_count)
 
     # لیست ایجاد شده از افراد به یک دیکشنری تبدیل میشود تا بتوان در تابع set_node_attributes از آن استفاده کرد
@@ -158,20 +172,26 @@ def go(node_count, percentage, position):
 
     # محاسبه مرکزیت بردار ویژه
     # در صورت رخ دادن exception تا 10 بار محاسبه مجددا انجام میشود
-    while True:
-        counter = 0
-        try:
-            if counter > 10:
-                print("Eigenvector centrality calculation stopped with errors. ")
-                break
+    # while True:
+    #     counter = 0
+    #     try:
+    #         if counter > 10:
+    #             print("Eigenvector centrality calculation stopped with errors. ")
+    #             break
+    #
+    #         bb = nx.eigenvector_centrality(net)
+    #         nx.set_node_attributes(net, bb, 'state')
+    #
+    #     except nx.exception.PowerIterationFailedConvergence:
+    #         continue
+    #     break
+    #     counter += 1
+    try:
+        bb = nx.eigenvector_centrality(net)
+        nx.set_node_attributes(net, bb, 'state')
 
-            bb = nx.eigenvector_centrality(net)
-            nx.set_node_attributes(net, bb, 'state')
-
-        except nx.exception.PowerIterationFailedConvergence:
-            continue
-        break
-        counter += 1
+    except nx.exception.PowerIterationFailedConvergence:
+        print("hi")
 
     first_generation = set_cooperators(net, percentage, position)
 

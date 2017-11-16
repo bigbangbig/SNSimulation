@@ -37,7 +37,7 @@ H1, H2, H3{
   font-family: roboto;
   display: inline-block;
   border-radius: 1px;
-  background-color: #9ab39b;
+  background-color: #9ab39b ;
   border: none;
   color: #100303;
   text-align: center;
@@ -56,6 +56,10 @@ H1, H2, H3{
   display: inline-block;
   position: relative;
   transition: 0.5s;
+}
+
+._dash-undo-redo{
+  display: none !important;
 }
 
 

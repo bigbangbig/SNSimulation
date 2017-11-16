@@ -1,8 +1,8 @@
 import networkx as nx
 import numpy as np
 import utilities.search as search
+import operator
 import random
-
 
 class Person:
     def __init__(self):
@@ -54,18 +54,13 @@ class Person:
         self._utility = util_value
 
 
-# ایجاد لیستی از افراد با تعداد مشخص و درصد اولیه مشخص
-def create_people(node_count, percentage):
+# ایجاد لیستی از افراد با تعداد مشخص
+def create_people(node_count):
     people = []
-    how_many = int((node_count * percentage) / 100)
     for i in range(node_count):
         person = Person()
-        if i < how_many:
-            person.strategy = "C"
-            person.new_strategy = "C"
-        else:
-            person.strategy = "D"
-            person.new_strategy = "D"
+        person.strategy = "D"
+        person.new_strategy = "D"
         person.id = i
         people.append(person)
     return people
@@ -115,16 +110,65 @@ def create_random_links(network, how_many):
     return network
 
 
-def go(node_count, percentage):
+def set_cooperators(network, percentage, position):
+    node_count = len(network.nodes())
+    how_many = int((node_count * percentage) / 100)
+    counter = 0
+    centrality_values = nx.get_node_attributes(network, 'state')
+
+    if position == 'c':
+        sorted_centralities = reversed(sorted(centrality_values.items(), key=operator.itemgetter(1)))
+    elif position == 'e':
+        sorted_centralities = sorted(centrality_values.items(), key=operator.itemgetter(1))
+    else:
+        while counter < how_many:
+            node = random.choice(list(network.nodes()))
+            if not network.nodes[node]['personality'].strategy == "C":
+                network.nodes[node]['personality'].strategy = "C"
+                network.nodes[node]['personality'].new_strategy = "C"
+                counter += 1
+        return network
+
+    for (node, centrality) in sorted_centralities:
+        if counter < how_many:
+            network.nodes[node]['personality'].strategy = "C"
+            network.nodes[node]['personality'].new_strategy = "C"
+            counter += 1
+        else:
+            break
+    return network
+
+
+def go(node_count, percentage, position):
 
     net = create_scale_free(node_count)
-    peoples_list = create_people(node_count, percentage)
+    peoples_list = create_people(node_count)
 
     # لیست ایجاد شده از افراد به یک دیکشنری تبدیل میشود تا بتوان در تابع set_node_attributes از آن استفاده کرد
     people = {key: value for (key, value) in enumerate(peoples_list)}
 
     nx.set_node_attributes(net, people, 'personality')
-    return net
+
+    # محاسبه مرکزیت بردار ویژه
+    # در صورت رخ دادن exception تا 10 بار محاسبه مجددا انجام میشود
+    while True:
+        counter = 0
+        try:
+            if counter > 10:
+                print("Eigenvector centrality calculation stopped with errors. ")
+                break
+
+            bb = nx.eigenvector_centrality(net)
+            nx.set_node_attributes(net, bb, 'state')
+
+        except nx.exception.PowerIterationFailedConvergence:
+            continue
+        break
+        counter += 1
+
+    first_generation = set_cooperators(net, percentage, position)
+
+    return first_generation
 
 
 def create_scale_free(node_count):

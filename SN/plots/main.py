@@ -1,6 +1,5 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-import plotly as py
 from plotly.graph_objs import *
 import operator
 import dash_html_components as html
@@ -22,7 +21,6 @@ def plot():
         mode='lines'
     )
     data = [trace]
-    # py.offline.plot(data, filename='Images/Cooperators.html')
     figure = Figure(
         data=data
     )
@@ -49,41 +47,23 @@ def init(network):
     global cooperators_in_round
     cooperators_in_round = []
 
-    # محاسبه مقدار مرکزیت بردار ویژه
-    # در صورت رخ دادن exception تا 10 بار محاسبه مجددا انجام میشود
-    while True:
-        counter = 0
-        try:
-            global centrality_values
-            if counter > 10:
-                print("Eigenvector centrality calculation stopped with errors. ")
-                break
-            bb = nx.eigenvector_centrality(network)
+    global centrality_values
+    centrality_values = nx.get_node_attributes(network, 'state')
 
-            nx.set_node_attributes(network, bb, 'state')
-            centrality_values = nx.get_node_attributes(network, 'state')
+    sorted_centralities = reversed(sorted(centrality_values.items(), key=operator.itemgetter(1)))
 
-            sorted_centralities = reversed(sorted(bb.items(), key=operator.itemgetter(1)))
-
-            centrality_counter = 1
-            global children
-            children = [
-                # html.Br(),
-                # html.Br(),
-                "Strategies of the most central nodes at the beginning: ",
-                html.Br()]
-            for (node, centrality) in sorted_centralities:
-                if centrality_counter > 10:
-                    break
-                children.append(html.Span("(" + str(centrality_counter) + "). Centrality: " + '%.5f' % centrality +
-                                ", Strategy: " + network.nodes[node]['personality'].strategy))
-                children.append(html.Br())
-                centrality_counter += 1
-
-        except nx.exception.PowerIterationFailedConvergence:
-            continue
-        break
-        counter += 1
+    centrality_counter = 1
+    global children
+    children = [
+        "Strategies of the most central nodes at the beginning: ",
+        html.Br()]
+    for (node, centrality) in sorted_centralities:
+        if centrality_counter > 10:
+            break
+        children.append(html.Span("(" + str(centrality_counter) + "). Centrality: " + '%.5f' % centrality +
+                                  ", Strategy: " + network.nodes[node]['personality'].strategy))
+        children.append(html.Br())
+        centrality_counter += 1
 
 
 # DEPRECATED
@@ -121,9 +101,7 @@ def draw(g):
     for edge in g.edges():
         xed += [pos[edge[0]][0], pos[edge[1]][0], None]
         yed += [pos[edge[0]][1], pos[edge[1]][1], None]
-    width = 1500
-    height = 800
-    axis = dict(showline=False,  # hide axis line, grid, ticklabels and  title
+    axis = dict(showline=False,
                 zeroline=False,
                 showgrid=False,
                 showticklabels=False,
@@ -187,11 +165,7 @@ def draw(g):
     for node in g.nodes():
         node_trace['marker']['color'].append(g.nodes[node]['state'])
 
-    annotation = html.Div(children=[
-                                    # html.Span("Number of nodes: " + str(node_count)),
-                                    # html.Br(),
-                                    # "Cooperators in last round: " + str(cooperators_in_round[-1][1]),
-                                    html.Span(children=children)])
+    annotation = html.Div(children=[html.Span(children=children)])
 
     data1 = Data([edge_trace, node_trace])
     fig1 = Figure(data=data1, layout=layout)

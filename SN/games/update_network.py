@@ -23,8 +23,8 @@ def copy_fittest(network):
         network.nodes[node]['personality'].strategy = network.nodes[node]['personality'].new_strategy
 
 
-def conditional_update(network):
-    homophily = 1
+def conditional_update(network, homophily):
+    # homophily = 1
     noise_level = 1
 
     for node in network.nodes():

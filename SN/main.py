@@ -19,11 +19,13 @@ coop_plot = []
 how_many_people = 500
 cooperation_percentage = 30
 rounds = 200
+homophily = 1
+position = 'r'
 
 
 def evolve():
     #  اطلاعات اولیه گراف را ذخیره میکند. مثل تعداد گره ها
-    graph = init.go(how_many_people, cooperation_percentage)
+    graph = init.go(how_many_people, cooperation_percentage, position)
     plots.init(graph)
     plots.save_network_info(graph, 0)
 
@@ -31,7 +33,7 @@ def evolve():
     for i in range(rounds):
         play.go(graph)
         # update.copy_fittest(G)
-        update.conditional_update(graph)
+        update.conditional_update(graph, homophily)
         plots.save_network_info(graph, i + 1)
     global fig, coop_plot
     fig, coop_plot = plots.show_results(graph)
@@ -89,6 +91,11 @@ app.layout = html.Div(children=[
         html.Span('Rounds to be played (number of generations): '),
         html.Span(id='rounds-value',
                   children=rounds),
+        html.Br(),
+        html.Span('Homophily level: '),
+        html.Span(id='homophily-value',
+                  children=homophily),
+        html.Br(),
         html.Button('Start the Evolution', id='go', className='button',
                     style={"vertical-align": "middle"}),
         dcc.Input(id='signal',
@@ -97,6 +104,7 @@ app.layout = html.Div(children=[
                   style={'display': 'none'}),
     ], className='section'),
     # اجرای شبیه سازی
+    # _______________________________________
     html.Div(children=[
         html.H3("Configure the simulation"),
         # تعداد نودها
@@ -128,6 +136,27 @@ app.layout = html.Div(children=[
                 value=200,
                 updatemode='drag',
                 className="slider"
+        ),
+        # سطح هموفیلی گره ها
+        dcc.Slider(
+                id="homophily",
+                min=1,
+                max=8,
+                step=1,
+                value=2,
+                updatemode='drag',
+                className="slider"
+        ),
+        # موقعیت همکاری کنندگان
+        dcc.RadioItems(
+            id='position',
+            options=[
+                {'label': 'Random', 'value': 'r'},
+                {'label': 'Central', 'value': 'c'},
+                {'label': 'Edge', 'value': 'e'}
+            ],
+            value=position,
+            className='slider'
         )], className='section'),
 ])
 
@@ -180,6 +209,22 @@ def change_count(value):
     global rounds
     rounds = value
     return value
+
+
+@app.callback(dash.dependencies.Output('homophily-value', 'children'),
+              [dash.dependencies.Input('homophily', 'value')])
+def change_count(value):
+    global homophily
+    homophily = value
+    return value
+
+
+@app.callback(dash.dependencies.Output('position', 'className'),
+              [dash.dependencies.Input('position', 'value')])
+def change_count(value):
+    global position
+    position = value
+    return "slider"
 
 
 @app.server.route('/dash_files/<path:path>')

@@ -21,6 +21,7 @@ cooperation_percentage = 30
 rounds = 200
 homophily = 1
 position = 'r'
+game = 'pd'
 
 
 def evolve():
@@ -31,7 +32,7 @@ def evolve():
 
     # # بازی به تعداد مشخص شده در range بین همه گره ها انجام میشود
     for i in range(rounds):
-        play.go(graph)
+        play.go(graph, game)
         # update.copy_fittest(G)
         update.conditional_update(graph, homophily)
         plots.save_network_info(graph, i + 1)
@@ -83,7 +84,7 @@ app.layout = html.Div(children=[
         html.Span(id='node-count-value',
                   children=how_many_people),
         html.Br(),
-        html.Span('Cooperators percentage in beginning: '),
+        html.Span('Cooperators percentage at the beginning: '),
         html.Span(id='cooperators-value',
                   children=cooperation_percentage),
         html.Span('%'),
@@ -156,7 +157,17 @@ app.layout = html.Div(children=[
                 {'label': 'Edge', 'value': 'e'}
             ],
             value=position,
-            className='slider'
+            className='slider radios'
+        ),
+        # بازی
+        dcc.RadioItems(
+            id='game',
+            options=[
+                {'label': "Prisoner's Dilemma", 'value': 'pd'},
+                {'label': 'Snow Drift', 'value': 'sd'}
+            ],
+            value=game,
+            className='slider radios'
         )], className='section'),
 ])
 
@@ -224,7 +235,15 @@ def change_count(value):
 def change_count(value):
     global position
     position = value
-    return "slider"
+    return "slider radios"
+
+
+@app.callback(dash.dependencies.Output('game', 'className'),
+              [dash.dependencies.Input('game', 'value')])
+def change_count(value):
+    global game
+    game = value
+    return "slider radios"
 
 
 @app.server.route('/dash_files/<path:path>')

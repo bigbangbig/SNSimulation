@@ -18,8 +18,12 @@ H1, H2, H3{
     width: 33%;
 }
 
+.visible{
+    visibility: hidden !important;
+}
+
 .slider{
-    padding-top: 2.3%;
+    margin-top: 1%;
 }
 
 @font-face {

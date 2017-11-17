@@ -23,25 +23,34 @@ homophily = 1
 position = 'r'
 game = 'pd'
 clusters = 1
+network = 'new'
+
+network_graph = init.go(how_many_people, cooperation_percentage, position, clusters)
 
 
-def evolve():
-    #  اطلاعات اولیه گراف را ذخیره میکند. مثل تعداد گره ها
-    graph = init.go(how_many_people, cooperation_percentage, position, clusters)
-    plots.init(graph)
-    plots.save_network_info(graph, 0)
+def create():
+    if network == "new":
+        global network_graph
+        network_graph = init.go(how_many_people, cooperation_percentage, position, clusters)
+    else:
+        init.assign_people_to_nodes(network_graph, cooperation_percentage, position)
+
+
+def evolve(g):
+    plots.init(g)
+    plots.save_network_info(g, 0)
 
     # # بازی به تعداد مشخص شده در range بین همه گره ها انجام میشود
     for i in range(rounds):
-        play.go(graph, game)
+        play.go(g, game)
         # update.copy_fittest(G)
-        update.conditional_update(graph, homophily)
-        plots.save_network_info(graph, i + 1)
+        update.conditional_update(g, homophily)
+        plots.save_network_info(g, i + 1)
     global fig, coop_plot
-    fig, coop_plot = plots.show_results(graph)
+    fig, coop_plot = plots.show_results(g, network)
 
 
-evolve()
+evolve(network_graph)
 
 app.css.config.serve_locally = True
 app.scripts.config.serve_locally = True
@@ -52,26 +61,6 @@ app.layout = html.Div(children=[
         href='/dash_files/site.css'
     ),
     html.H1(children='Analysing Human Cooperation Patterns'),
-    html.Hr(),
-    # _______________________________________________________
-    # گراف شبکه در نسل آخر
-    html.Div(children=[
-        html.H3(children='''
-                The Network, nodes and connections between them
-                '''),
-        dcc.Graph(
-            id='graph',
-            figure=fig[0]
-            )
-    ], className='graph-section'),
-    # نمودار تغییر تعداد همکاری کنندگان در طول نسلها
-    html.Div(children=[
-        html.H3('Number of cooperators in each generation/round'),
-        dcc.Graph(
-            id='plot',
-            figure=coop_plot
-        )
-    ], className="graph-section"),
     html.Hr(),
     # __________________________________________________________
     # اطلاعات شبکه، تعداد نودها و استراتژی اولیه نودهای مرکزی
@@ -115,53 +104,53 @@ app.layout = html.Div(children=[
         html.H3("Configure the simulation"),
         # تعداد نودها
         dcc.Slider(
-                id='node-count',
-                min=50,
-                max=1000,
-                step=50,
-                value=200,
-                updatemode='drag',
-                className="slider"
+            id='node-count',
+            min=50,
+            max=1000,
+            step=50,
+            value=200,
+            updatemode='drag',
+            className="slider"
         ),
         # درصد همکاری کنندگان
         dcc.Slider(
-                id='cooperators',
-                min=1,
-                max=100,
-                step=1,
-                value=10,
-                updatemode='drag',
-                className="slider"
+            id='cooperators',
+            min=1,
+            max=100,
+            step=1,
+            value=10,
+            updatemode='drag',
+            className="slider"
         ),
         # تعداد دورهای بازی
         dcc.Slider(
-                id="rounds",
-                min=50,
-                max=500,
-                step=50,
-                value=200,
-                updatemode='drag',
-                className="slider"
+            id="rounds",
+            min=50,
+            max=500,
+            step=50,
+            value=200,
+            updatemode='drag',
+            className="slider"
         ),
         # سطح هموفیلی گره ها
         dcc.Slider(
-                id="homophily",
-                min=1,
-                max=8,
-                step=1,
-                value=2,
-                updatemode='drag',
-                className="slider"
+            id="homophily",
+            min=1,
+            max=8,
+            step=1,
+            value=2,
+            updatemode='drag',
+            className="slider"
         ),
         # تعداد کلاسترها
         dcc.Slider(
-                id="cluster",
-                min=1,
-                max=5,
-                step=1,
-                value=1,
-                updatemode='drag',
-                className="slider"
+            id="cluster",
+            min=1,
+            max=5,
+            step=1,
+            value=1,
+            updatemode='drag',
+            className="slider"
         ),
         # موقعیت همکاری کنندگان
         dcc.RadioItems(
@@ -183,7 +172,37 @@ app.layout = html.Div(children=[
             ],
             value=game,
             className='slider radios'
+        ),
+        # شبکه
+        dcc.RadioItems(
+            id='new-network',
+            options=[
+                {'label': "New Network", 'value': 'new'},
+                {'label': 'Same Network', 'value': 'same'}
+            ],
+            value=network,
+            className='slider radios'
         )], className='section'),
+    html.Hr(style={'width': '100%'}, className='graph-section'),
+    # _______________________________________________________
+    # گراف شبکه در نسل آخر
+    html.Div(children=[
+        html.H3(children='''
+                The Network, nodes and connections between them
+                '''),
+        dcc.Graph(
+            id='graph',
+            figure=fig[0]
+            )
+    ], className='graph-section'),
+    # نمودار تغییر تعداد همکاری کنندگان در طول نسلها
+    html.Div(children=[
+        html.H3('Number of cooperators in each generation/round'),
+        dcc.Graph(
+            id='plot',
+            figure=coop_plot
+        )
+    ], className="graph-section"),
 ])
 
 
@@ -191,7 +210,8 @@ app.layout = html.Div(children=[
               [dash.dependencies.Input('go', 'n_clicks')])
 def signal(n_clicks):
     if not n_clicks == 0 and n_clicks is not None:
-        evolve()
+        create()
+        evolve(network_graph)
     return n_clicks
 
 
@@ -219,6 +239,24 @@ def change_count(value):
     global how_many_people
     how_many_people = value
     return value
+
+
+@app.callback(dash.dependencies.Output('node-count', 'disabled'),
+              [dash.dependencies.Input('new-network', 'value')])
+def change_count(value):
+    if value == "new":
+        return False
+    else:
+        return True
+
+
+@app.callback(dash.dependencies.Output('cluster', 'disabled'),
+              [dash.dependencies.Input('new-network', 'value')])
+def change_count(value):
+    if value == "new":
+        return False
+    else:
+        return True
 
 
 @app.callback(dash.dependencies.Output('cooperators-value', 'children'),
@@ -266,6 +304,14 @@ def change_count(value):
 def change_count(value):
     global game
     game = value
+    return "slider radios"
+
+
+@app.callback(dash.dependencies.Output('new-network', 'className'),
+              [dash.dependencies.Input('new-network', 'value')])
+def change_count(value):
+    global network
+    network = value
     return "slider radios"
 
 

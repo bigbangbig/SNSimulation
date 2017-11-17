@@ -9,6 +9,10 @@ cooperators_in_round = []
 node_count = 0
 centrality_values = []
 children = []
+xv = []
+yv = []
+xed = []
+yed = []
 
 
 # رسم نمودار تعداد همکاری کنندگان بر حسب دورهای بازی
@@ -91,20 +95,24 @@ def show_network(g):
     plt.show()
 
 
-def draw(g):
+def draw(g, network):
     # pos = nx.fruchterman_reingold_layout(g)
-    # pos = nx.circular_layout(g)
-    # pos = nx.shell_layout(g)
-    # pos = nx.kamada_kawai_layout(g)
-    pos = nx.spring_layout(g)
-    n = node_count
-    xv = [pos[k][0] for k in range(n)]
-    yv = [pos[k][1] for k in range(n)]
-    xed = []
-    yed = []
-    for edge in g.edges():
-        xed += [pos[edge[0]][0], pos[edge[1]][0], None]
-        yed += [pos[edge[0]][1], pos[edge[1]][1], None]
+    # pos = nx.spring_layout(g, iterations=1000, dim=3)
+    global xv, yv, xed, yed
+    if network == 'new':
+        pos = nx.spring_layout(g)
+        n = node_count
+        xv = [pos[k][0] for k in range(n)]
+        yv = [pos[k][1] for k in range(n)]
+        # zv = [pos[k][2] for k in range(n)]
+        xed = []
+        yed = []
+        # zed = []
+        for edge in g.edges():
+            xed += [pos[edge[0]][0], pos[edge[1]][0], None]
+            yed += [pos[edge[0]][1], pos[edge[1]][1], None]
+            # zed += [pos[edge[0]][2], pos[edge[1]][2], None]
+
     axis = dict(showline=False,
                 zeroline=False,
                 showgrid=False,
@@ -119,14 +127,15 @@ def draw(g):
                     margin=Margin(
                         l=40,
                         r=40,
-                        b=85,
-                        t=100,
+                        b=0,
+                        t=0,
                     ),
                     hovermode='closest'
                     )
 
     edge_trace = Scatter(x=xed,
                          y=yed,
+                         # z=zed,
                          mode='lines',
                          line=Line(color='rgb(210,210,210)', width=1),
                          hoverinfo='none'
@@ -147,6 +156,7 @@ def draw(g):
 
     node_trace = Scatter(x=xv,
                          y=yv,
+                         # z=zv,
                          mode='markers',
                          name='net',
                          marker=Marker(symbol='dot',
@@ -179,7 +189,7 @@ def draw(g):
     return fig1, annotation
 
 
-def show_results(g):
-    figure = draw(g)
+def show_results(g, network):
+    figure = draw(g, network)
     coop_plot = plot()
     return figure, coop_plot

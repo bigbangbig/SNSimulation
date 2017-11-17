@@ -181,6 +181,18 @@ def centrality_calculator(network):
         break
 
 
+def assign_people_to_nodes(network, percentage, position):
+    node_count = len(network.nodes())
+    peoples_list = create_people(node_count)
+
+    # لیست ایجاد شده از افراد به یک دیکشنری تبدیل میشود تا بتوان در تابع set_node_attributes از آن استفاده کرد
+    people = {key: value for (key, value) in enumerate(peoples_list)}
+    nx.set_node_attributes(network, people, 'personality')
+
+    first_generation = set_cooperators(network, percentage, position)
+    return first_generation
+
+
 def go(node_count, percentage, position, clusters):
     # تعیین اندازه هر یک از کلاسترها و ایجاد شبکه های متناظر
     size = int(node_count / clusters)
@@ -190,13 +202,8 @@ def go(node_count, percentage, position, clusters):
         net = nx.disjoint_union(net, graph)
     # اتصال کلاسترها به یکدیگر
     net = connect_components(net)
-    peoples_list = create_people(node_count)
 
-    # لیست ایجاد شده از افراد به یک دیکشنری تبدیل میشود تا بتوان در تابع set_node_attributes از آن استفاده کرد
-    people = {key: value for (key, value) in enumerate(peoples_list)}
-    nx.set_node_attributes(net, people, 'personality')
-
-    first_generation = set_cooperators(net, percentage, position)
+    first_generation = assign_people_to_nodes(net, percentage, position)
 
     return first_generation
 

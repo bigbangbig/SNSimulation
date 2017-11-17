@@ -4,6 +4,7 @@ import utilities.search as search
 import operator
 import random
 
+
 class Person:
     def __init__(self):
         self._strategy = None
@@ -139,58 +140,61 @@ def set_cooperators(network, percentage, position):
     return network
 
 
-def go(node_count, percentage, position):
-    # todo make the connecting component part, a function
-    clusters = 3
-    size = int(node_count / clusters)
-    net1 = create_scale_free(size + (node_count - (size * 3)))
-    for i in range(clusters - 1):
-        print(len(net1))
-        gg = create_scale_free(size)
-        net1 = nx.disjoint_union(net1, gg)
-    net = create_scale_free(node_count)
-    net = net1
-    if not nx.is_connected(net):
+# با این که حداقل تعداد یالها 1 در نظر گرفته شده
+# ممکن است با ایجاد یک چند ضلعی بدون قطر، گراف همبند نباشد (در یکی از اجراها یک مثلث جدا مشاهده شد)
+#  در این قسمت، وجود چند مولفه همبندی بررسی شده، و در صورت نیاز بین آنها اتصال برقرار خواهد شد
+def connect_components(network):
+    if not nx.is_connected(network):
         print("Network is not connected. Attempting to connect the components..")
         component_counter = 0
-        components = sorted(nx.connected_component_subgraphs(net), key=len)
+        components = sorted(nx.connected_component_subgraphs(network), key=len)
         for c in range(len(components)):
             if component_counter == 0:
                 component_counter += 1
                 continue
             else:
-                net.add_edge(next(iter(components[component_counter].nodes())),
-                             next(iter(components[component_counter - 1].nodes())))
+                network.add_edge(next(iter(components[component_counter].nodes())),
+                                 next(iter(components[component_counter - 1].nodes())))
                 component_counter += 1
+    return network
+
+
+# محاسبه مرکزیت بردار ویژه
+def centrality_calculator(network):
+    # در صورت رخ دادن exception تا 10 بار محاسبه مجددا انجام میشود
+    counter = 0
+    while True:
+        try:
+            if counter > 10:
+                print("Eigenvector centrality calculation stopped with errors. ")
+                break
+            # وقتی exception به وجود بیاید، محاسبه دوباره یا چند باره تاثیری ندارد
+            # به همین دلیل از مرکزیت بردار ویژه در numpy استفاده میکنیم که تا کنون محاسبات رو بدون exception
+            # انجام داده است
+            # bb = nx.eigenvector_centrality(net)
+            centrality = nx.eigenvector_centrality_numpy(network)
+            nx.set_node_attributes(network, centrality, 'state')
+
+        except nx.exception.PowerIterationFailedConvergence:
+            counter += 1
+            continue
+        break
+
+
+def go(node_count, percentage, position, clusters):
+    # تعیین اندازه هر یک از کلاسترها و ایجاد شبکه های متناظر
+    size = int(node_count / clusters)
+    net = create_scale_free(size + (node_count - (size * clusters)))
+    for i in range(clusters - 1):
+        graph = create_scale_free(size)
+        net = nx.disjoint_union(net, graph)
+    # اتصال کلاسترها به یکدیگر
+    net = connect_components(net)
     peoples_list = create_people(node_count)
 
     # لیست ایجاد شده از افراد به یک دیکشنری تبدیل میشود تا بتوان در تابع set_node_attributes از آن استفاده کرد
     people = {key: value for (key, value) in enumerate(peoples_list)}
-
     nx.set_node_attributes(net, people, 'personality')
-
-    # محاسبه مرکزیت بردار ویژه
-    # در صورت رخ دادن exception تا 10 بار محاسبه مجددا انجام میشود
-    # while True:
-    #     counter = 0
-    #     try:
-    #         if counter > 10:
-    #             print("Eigenvector centrality calculation stopped with errors. ")
-    #             break
-    #
-    #         bb = nx.eigenvector_centrality(net)
-    #         nx.set_node_attributes(net, bb, 'state')
-    #
-    #     except nx.exception.PowerIterationFailedConvergence:
-    #         continue
-    #     break
-    #     counter += 1
-    try:
-        bb = nx.eigenvector_centrality(net)
-        nx.set_node_attributes(net, bb, 'state')
-
-    except nx.exception.PowerIterationFailedConvergence:
-        print("Eigenvector centrality calculation stopped with errors.")
 
     first_generation = set_cooperators(net, percentage, position)
 
@@ -200,8 +204,6 @@ def go(node_count, percentage, position):
 def create_scale_free(node_count):
     power_law_sequence = nx.utils.powerlaw_sequence(node_count, exponent=2.0)
     seq_sum = 0
-
-    # clusters_list[0] = nx.utils.powerlaw_sequence(size + (node_count - (size * clusters)), exponent=2.0)
     # تعداد زیادی از اعداد ایجاد شده توسط تابع powerlaw_sequence کمتر از 1 خواهند بود
     # چون هدف بررسی انتشار همکاریست، نیاز داریم که همه نودها با هم ارتباط داشته باشند
     # پس هر نود باید حداقل یک یال داشته باشد
@@ -217,20 +219,8 @@ def create_scale_free(node_count):
     g = nx.Graph(g)
     g.remove_edges_from(g.selfloop_edges())
 
-    # با این که حداقل تعداد یالها 1 در نظر گرفته شده
-    # ممکن است با ایجاد یک چند ضلعی بدون قطر، گراف همبند نباشد (در یکی از اجراها یک مثلث جدا مشاهده شد)
-    # در این قسمت، وجود چند مولفه همبندی بررسی شده، و در صورت نیاز بین آنها اتصال برقرار خواهد شد
-    if not nx.is_connected(g):
-        print("Network is not connected. Attempting to connect the components..")
-        component_counter = 0
-        components = sorted(nx.connected_component_subgraphs(g), key=len)
-        for c in range(len(components)):
-            if component_counter == 0:
-                component_counter += 1
-                continue
-            else:
-                g.add_edge(next(iter(components[component_counter].nodes())),
-                           next(iter(components[component_counter - 1].nodes())))
-                component_counter += 1
+    g = connect_components(g)
+
+    centrality_calculator(g)
 
     return g

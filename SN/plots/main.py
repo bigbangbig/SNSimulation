@@ -92,7 +92,11 @@ def show_network(g):
 
 
 def draw(g):
-    pos = nx.fruchterman_reingold_layout(g)
+    # pos = nx.fruchterman_reingold_layout(g)
+    # pos = nx.circular_layout(g)
+    # pos = nx.shell_layout(g)
+    # pos = nx.kamada_kawai_layout(g)
+    pos = nx.spring_layout(g)
     n = node_count
     xv = [pos[k][0] for k in range(n)]
     yv = [pos[k][1] for k in range(n)]

@@ -22,11 +22,12 @@ rounds = 200
 homophily = 1
 position = 'r'
 game = 'pd'
+clusters = 1
 
 
 def evolve():
     #  اطلاعات اولیه گراف را ذخیره میکند. مثل تعداد گره ها
-    graph = init.go(how_many_people, cooperation_percentage, position)
+    graph = init.go(how_many_people, cooperation_percentage, position, clusters)
     plots.init(graph)
     plots.save_network_info(graph, 0)
 
@@ -97,6 +98,10 @@ app.layout = html.Div(children=[
         html.Span(id='homophily-value',
                   children=homophily),
         html.Br(),
+        html.Span('Clusters of the network: '),
+        html.Span(id='clusters-value',
+                  children=clusters),
+        html.Br(),
         html.Button('Start the Evolution', id='go', className='button',
                     style={"vertical-align": "middle"}),
         dcc.Input(id='signal',
@@ -145,6 +150,16 @@ app.layout = html.Div(children=[
                 max=8,
                 step=1,
                 value=2,
+                updatemode='drag',
+                className="slider"
+        ),
+        # تعداد کلاسترها
+        dcc.Slider(
+                id="cluster",
+                min=1,
+                max=5,
+                step=1,
+                value=1,
                 updatemode='drag',
                 className="slider"
         ),
@@ -227,6 +242,14 @@ def change_count(value):
 def change_count(value):
     global homophily
     homophily = value
+    return value
+
+
+@app.callback(dash.dependencies.Output('clusters-value', 'children'),
+              [dash.dependencies.Input('cluster', 'value')])
+def change_count(value):
+    global clusters
+    clusters = value
     return value
 
 

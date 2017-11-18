@@ -13,18 +13,24 @@ xv = []
 yv = []
 xed = []
 yed = []
+data = []
 
 
 # رسم نمودار تعداد همکاری کنندگان بر حسب دورهای بازی
-def plot():
+def plot(network):
     x = [x[0] for x in cooperators_in_round]
     y = [x[1] for x in cooperators_in_round]
+    global data
+    if network == "new":
+        data = []
     trace = Scatter(
         x=x,
         y=y,
-        mode='lines'
+        mode='markers',
+        name=str(len(data) + 1)
     )
-    data = [trace]
+
+    data.append(trace)
     figure = Figure(
         data=data
     )
@@ -191,5 +197,5 @@ def draw(g, network):
 
 def show_results(g, network):
     figure = draw(g, network)
-    coop_plot = plot()
+    coop_plot = plot(network)
     return figure, coop_plot

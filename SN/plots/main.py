@@ -27,14 +27,11 @@ def plot(network):
     trace = Scatter(
         x=x,
         y=y,
-        mode='lines',
-        name=str(len(data) + 1)
+        mode='markers',
+        name=str(len(data))
     )
 
     data.append(trace)
-    figure = Figure(
-        data=data
-    )
 
     if not network == "new":
         av_y = []
@@ -52,7 +49,7 @@ def plot(network):
         av_trace = Scatter(
             y=av_y,
             x=x,
-            mode='markers',
+            mode='lines',
             name='Average'
         )
 
@@ -60,6 +57,10 @@ def plot(network):
             data[0] = av_trace
         else:
             data.insert(0, av_trace)
+
+    figure = Figure(
+        data=data
+    )
 
     return figure
 

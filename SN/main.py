@@ -8,7 +8,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import os
 
-from dash.dependencies import Input, Output
+from dash.dependencies import Input
 from flask import send_from_directory
 
 
@@ -210,8 +210,13 @@ app.layout = html.Div(children=[
               [dash.dependencies.Input('go', 'n_clicks')])
 def signal(n_clicks):
     if not n_clicks == 0 and n_clicks is not None:
+        global network
         create()
         evolve(network_graph)
+        # network = "old"
+        # for i in range(50):
+        #     create()
+        #     evolve(network_graph)
     return n_clicks
 
 

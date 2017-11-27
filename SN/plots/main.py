@@ -23,10 +23,11 @@ def plot(network):
     global data
     if network == "new":
         data = []
+
     trace = Scatter(
         x=x,
         y=y,
-        mode='markers',
+        mode='lines',
         name=str(len(data) + 1)
     )
 
@@ -34,6 +35,32 @@ def plot(network):
     figure = Figure(
         data=data
     )
+
+    if not network == "new":
+        av_y = []
+        counter = 0
+        for i in range(len(x)):
+            av_y.append(0)
+            for j in data:
+                av_y[counter] += j.y[i]
+            av_y[counter] /= len(data)
+            # for j in i.y:
+            #     # print(j)
+            #     av_y[counter] += i.y[j]
+            # av_y[counter] / len(i.y)
+            counter += 1
+        av_trace = Scatter(
+            y=av_y,
+            x=x,
+            mode='markers',
+            name='Average'
+        )
+
+        if len(data) > 2:
+            data[0] = av_trace
+        else:
+            data.insert(0, av_trace)
+
     return figure
 
 

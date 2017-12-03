@@ -24,6 +24,7 @@ position = 'r'
 game = 'pd'
 clusters = 1
 network = 'new'
+method = 'mu'
 
 network_graph = init.go(how_many_people, cooperation_percentage, position, clusters)
 
@@ -44,7 +45,7 @@ def evolve(g):
     for i in range(rounds):
         play.go(g, game)
         # update.copy_fittest(G)
-        update.conditional_update(g, homophily)
+        update.conditional_update(g, homophily, method)
         plots.save_network_info(g, i + 1)
     global fig, coop_plot
     fig, coop_plot = plots.show_results(g, network)
@@ -173,6 +174,16 @@ app.layout = html.Div(children=[
             value=game,
             className='slider radios'
         ),
+        # نحوه تغییر استراتژی
+        dcc.RadioItems(
+            id='update_method',
+            options=[
+                {'label': "Random Neighbor", 'value': 'rd'},
+                {'label': 'Neighbor with the most "Utility"', 'value': 'mu'}
+            ],
+            value=method,
+            className='slider radios'
+        ),
         # شبکه
         dcc.RadioItems(
             id='new-network',
@@ -213,10 +224,12 @@ def signal(n_clicks):
         global network
         create()
         evolve(network_graph)
-        # network = "old"
-        # for i in range(50):
-        #     create()
-        #     evolve(network_graph)
+        temp = network
+        network = "old"
+        for i in range(150):
+            create()
+            evolve(network_graph)
+        network = temp
     return n_clicks
 
 
@@ -309,6 +322,14 @@ def change_count(value):
 def change_count(value):
     global game
     game = value
+    return "slider radios"
+
+
+@app.callback(dash.dependencies.Output('update_method', 'className'),
+              [dash.dependencies.Input('update_method', 'value')])
+def change_count(value):
+    global method
+    method = value
     return "slider radios"
 
 

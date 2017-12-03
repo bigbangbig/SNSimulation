@@ -1,8 +1,12 @@
 import random
 import math
+import operator
 
 
 # از بین همسایگان، استراتژی برازنده ترین آنها به عنوان استراتژی دور بعد انتخاب میشود
+from jsonschema._validators import enum
+
+
 def copy_fittest(network):
     for node in network.nodes():
         # update nodes
@@ -22,7 +26,7 @@ def copy_fittest(network):
         network.nodes[node]['personality'].strategy = network.nodes[node]['personality'].new_strategy
 
 
-def conditional_update(network, homophily):
+def conditional_update(network, homophily, method):
     # homophily = 1
     noise_level = 1
 
@@ -34,8 +38,29 @@ def conditional_update(network, homophily):
         maximum_chance = 0
         strategy = person.strategy
 
-        # بازیکن دوم به صورت تصادفی از بین همسایه ها انتخاب میشود
-        mate = random.choice(list(network.neighbors(node)))
+        pass
+        all_nodes = len(list(network.neighbors(node)))
+        coops = 0
+        for i in network.neighbors(node):
+            if network.nodes[i]['personality'].strategy == "C":
+                coops += 1
+        if float(coops / all_nodes) > 0.1:
+            person.new_strategy = "C"
+            continue
+
+        mate = 0
+
+        if method == "rd":
+            # بازیکن دوم به صورت تصادفی از بین همسایه ها انتخاب میشود
+            mate = random.choice(list(network.neighbors(node)))
+        elif method == "mu":
+            # بازیکن دوم برابر با پرسودترین همسایه قرار میگیرد
+            max_util = 0
+            for i in network.neighbors(node):
+                if network.nodes[i]['personality'].utility > max_util:
+                    max_util = network.nodes[i]['personality'].utility
+                    mate = i
+
         second_person = network.nodes[mate]['personality']
         # احتمال اینکه بازیکن اول، استراتژی بازیکن دوم را انتخاب کند
         chance = 0

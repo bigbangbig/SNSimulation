@@ -41,10 +41,6 @@ def plot(network):
             for j in data:
                 av_y[counter] += j.y[i]
             av_y[counter] /= len(data)
-            # for j in i.y:
-            #     # print(j)
-            #     av_y[counter] += i.y[j]
-            # av_y[counter] / len(i.y)
             counter += 1
         av_trace = Scatter(
             y=av_y,
@@ -53,7 +49,7 @@ def plot(network):
             name='Average'
         )
 
-        if len(data) > 2:
+        if len(data) > 1:
             data[0] = av_trace
         else:
             data.insert(0, av_trace)

@@ -44,7 +44,7 @@ def conditional_update(network, homophily, method):
         for i in network.neighbors(node):
             if network.nodes[i]['personality'].strategy == "C":
                 coops += 1
-        if float(coops / all_nodes) > 0.1:
+        if float(coops / all_nodes) > 0.8:
             person.new_strategy = "C"
             continue
 

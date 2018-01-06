@@ -89,13 +89,13 @@ def init(network):
     centrality_counter = 1
     global children
     children = [
-        "Strategies of the most central nodes at the beginning: ",
+        "استراتژی های مرکزی ترین گره ها (افراد) در شروع تکامل: ",
         html.Br()]
     for (node, centrality) in sorted_centralities:
         if centrality_counter > 10:
             break
-        children.append(html.Span("(" + str(centrality_counter) + "). Centrality: " + '%.5f' % centrality +
-                                  ", Strategy: " + network.nodes[node]['personality'].strategy))
+        children.append(html.Span("(" + str(centrality_counter) + "). مرکزیت: " + '%.5f' % centrality +
+                                  ", استراتژی: " + network.nodes[node]['personality'].strategy))
         children.append(html.Br())
         centrality_counter += 1
 
@@ -177,12 +177,12 @@ def draw(g, network):
     # برچسب استراتژی
     personalities = nx.get_node_attributes(g, 'personality')
     for i in personalities:
-        labels.append("Strategy: " + str(personalities[i].strategy))
+        labels.append(" استراتژی:" + str(personalities[i].strategy))
 
     # برچسب مقدار مرکزیت بردار ویژه
     global centrality_values
     for i in centrality_values:
-        labels[i] += ("<br>Centrality: " + str(centrality_values[i]))
+        labels[i] += ("<br>مرکزیت: " + str(centrality_values[i]))
 
     node_trace = Scatter(x=xv,
                          y=yv,

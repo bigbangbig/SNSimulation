@@ -496,6 +496,10 @@ def static_file(path):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
+    print("hi")
 
+app = dash.Dash(__name__)
+
+server = app.server
 
